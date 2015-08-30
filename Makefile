@@ -29,4 +29,4 @@ else
 	$(CXX) $(CXXFLAGS) $(CCFLAGS) $(LDFLAGS) -shared -o $(SLIB) $(OBJS) -lSOIL
 endif
 
-include /opt/kodi/Makefile.include
+include ../../../Makefile.include
