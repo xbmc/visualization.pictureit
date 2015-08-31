@@ -19,7 +19,7 @@
  *
  */
 
-#include "contrib/kissfft/kiss_fftr.h"
+#include "kiss_fftr.h"
 #include <vector>
 
 //! \brief Class performing a RFFT of interleaved stereo data.
