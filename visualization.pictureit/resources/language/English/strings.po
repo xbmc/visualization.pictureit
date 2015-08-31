@@ -1,10 +1,10 @@
 # Kodi Media Center language file
-# Addon Name: PictureVis
-# Addon id: visualization.picturevis
+# Addon Name: PictureIt
+# Addon id: visualization.pictureit
 # Addon Provider: linuxwhatelse
 msgid ""
 msgstr ""
-"Project-Id-Version: visualization.picturevis\n"
+"Project-Id-Version: visualization.pictureit\n"
 "Report-Msgid-Bugs-To: tadly@linuxwhatelse.de\n"
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
