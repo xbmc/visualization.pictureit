@@ -1,0 +1,66 @@
+# Kodi Media Center language file
+# Addon Name: PictureVis
+# Addon id: visualization.picturevis
+# Addon Provider: linuxwhatelse
+msgid ""
+msgstr ""
+"Project-Id-Version: visualization.picturevis\n"
+"Report-Msgid-Bugs-To: tadly@linuxwhatelse.de\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: tadly\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+msgctxt "#20000"
+msgid "General"
+msgstr ""
+
+msgctxt "#20001"
+msgid "Presets root directory"
+msgstr ""
+
+msgctxt "#20002"
+msgid "Transition time (sec.)"
+msgstr ""
+
+msgctxt "#20003"
+msgid "Update on new track"
+msgstr ""
+
+msgctxt "#20004"
+msgid "Update by intervall"
+msgstr ""
+
+msgctxt "#20005"
+msgid "Image update interval (min.)"
+msgstr ""
+
+msgctxt "#30000"
+msgid "Spectrum"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Enable spectrum"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Show spectrum background"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Width"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Padding bottom"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Animation speed"
+msgstr ""
