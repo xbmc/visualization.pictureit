@@ -1,15 +1,16 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <addon
-	id="visualization.pictureit"
-	version="0.0.1"
-	name="PictureIt"
-	provider-name="linuxwhatelse">
-	<extension
-		point="xbmc.player.musicviz"
-		library_@PLATFORM@="@LIBRARY_FILENAME@" />
-	<extension point="xbmc.addon.metadata">
-		<summary lang="en">Elegant and simple...</summary>
-		<description lang="en">PictureIt will replace your flashy visualization with wallpapers you love.</description>
-		<platform>@PLATFORM@</platform>
-	</extension>
+    id="visualization.pictureit"
+    version="0.0.1"
+    name="PictureIt"
+    provider-name="linuxwhatelse">
+    <extension
+        point="xbmc.player.musicviz"
+        library_linux="visualization.pictureit.so" />
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Elegant and simple...</summary>
+        <description lang="en">PictureIt will replace your flashy visualization with wallpapers you love.</description>
+        <platform>linux</platform>
+        <forum>http://forum.kodi.tv/showthread.php?tid=236514</forum>
+    </extension>
 </addon>
