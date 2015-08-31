@@ -406,16 +406,18 @@ extern "C" void Render() {
             glColor3f( 1.0f, 1.0f, 1.0f );
 
             GLfloat x1, x2;
-            GLfloat y = ::fabs( vis_width ) ;
-            GLfloat width = ( (y * -1) * 2.0f ) / ( vis_bar_count * 2 );
-            y = y - ( width / (1.9f * 2) );
-            for ( int i = 0; i < vis_bar_count; i++ ) {
-                x1 = y + ( width / 1.9f );
-                x2 = y + width;
+            float bar_width = vis_width / vis_bar_count;
+            for ( int i = 1; i <= vis_bar_count; i++ ) {
+                // calculate position
+                x1 = ( vis_width * -1 ) + ( i * bar_width ) - bar_width;
+                x2 = ( vis_width * -1 ) + ( i * bar_width );
 
-                draw_bars( i, x1, x2 );
+                // "add" a gap (which is 1/4 of the initial bar_width)
+                // to both the left and right side of the bar
+                x1 = x1 + ( bar_width / 4 );
+                x2 = x2 - ( bar_width / 4 );
 
-                y = x2;
+                draw_bars( (i-1), x1, x2 );
             }
         glPopMatrix();
     }
