@@ -1,5 +1,4 @@
-#include "addons/include/xbmc_vis_dll.h"
-#include "utils/log.h"
+#include "xbmc_vis_dll.h"
 
 #include <stdio.h>
 #include <sys/time.h>
@@ -14,8 +13,7 @@
 #include <dirent.h>
 #include <fnmatch.h>
 
-#include <GL/glew.h>
-
+#include <GL/gl.h>
 #include "SOIL.h"
 
 /*
