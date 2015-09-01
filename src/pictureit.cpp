@@ -49,7 +49,6 @@ int                    vis_bg_enabled          =    true;                // If t
 const int              vis_bar_count           =    96;                  // Amount of single bars to display
 GLfloat                vis_width               =    0.8f;                // Used to define some "padding" left and right. If set to 1.0 the bars will go to the screen edge (Kodi setting)
 GLfloat                vis_bottom_edge         =    0.98f;               // If set to 1.0 the bars would be exactly on the bottom screen edge (Kodi setting)
-const GLfloat          vis_gap_factor          =    1.9f;                //
 const GLfloat          vis_bar_min_height      =    0.02f;               // The min height for each bar
 const GLfloat          vis_bar_max_height      =    0.18f;               // The max height for each bar
 GLfloat                vis_animation_speed     =    0.007f;              // Animation speed. The smaler the value, the slower AND smoother the animations (Kodi setting)
