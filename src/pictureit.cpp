@@ -26,7 +26,7 @@ GLuint                 img_tex_ids[3]          =    {};
 
 bool                   update_img              =    false;               // When set to "true", a new image will be crossfaded
 
-const char*            presets_root_dir        =    "";                  // Root directory holding subfolder that will be used as presets and searched for images
+const char*            presets_root_dir        =    "";                  // Root directory holding subfolders that will be used as presets and searched for images
 unsigned int           presets_count           =    0;                   // Amount of presets (subfolders) found
 unsigned int           preset_index            =    0;                   // Index of the currently selected preset
 bool                   preset_random           =    false;               // If random preset is active
@@ -46,22 +46,26 @@ int                    fade_offset_ms          =    0;                   // Used
 
 int                    vis_enabled             =    true;                // If the spectrum is enabled (Kodi setting)
 int                    vis_bg_enabled          =    true;                // If the transparent background behind the spectrum is enabled (Kodi setting)
-const int              vis_bar_count           =    96;                  // Amount of single bars to display
+const int              vis_bar_count           =    96;                  // Amount of single bars to display (will be doubled as we mirror them to the right side)
 GLfloat                vis_width               =    0.8f;                // Used to define some "padding" left and right. If set to 1.0 the bars will go to the screen edge (Kodi setting)
-GLfloat                vis_bottom_edge         =    0.98f;               // If set to 1.0 the bars would be exactly on the bottom screen edge (Kodi setting)
+GLfloat                vis_bottom_edge         =    0.98f;               // If set to 1.0 the bars would be exactly on the screen edge (Kodi setting)
 const GLfloat          vis_bar_min_height      =    0.02f;               // The min height for each bar
 const GLfloat          vis_bar_max_height      =    0.18f;               // The max height for each bar
 GLfloat                vis_animation_speed     =    0.007f;              // Animation speed. The smaler the value, the slower AND smoother the animations (Kodi setting)
 const float            vis_bottom_edge_scale[] =    { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
 
-GLfloat                vis_bar_heights[vis_bar_count], pvis_bar_heights[vis_bar_count], cvis_bar_heights[vis_bar_count] = {};    // In here we store the audiodata used to "visualise" our bars. "cvis_bar_heights" is used to smoothen the animatio
+// In here we store the audiodata used to "visualize" our bars.
+// vis_bar_heights  = whatever we get from AudioData
+// pvis_bar_heights = the previous value we got from AudioData (used to calculate some form of gravity. The bigger the difference, the faster the bars will move)
+// cvis_bar_heights = used to smoothen the animation on a "per frame" basis.
+GLfloat                vis_bar_heights[vis_bar_count], pvis_bar_heights[vis_bar_count], cvis_bar_heights[vis_bar_count] = {};
 
 typedef     std::vector<std::string>              td_vec_str;
 typedef     std::map<std::string, td_vec_str>     td_map_data;
 
-td_vec_str      pi_presets;     // Hold all preset-names in alphabetical order
-td_vec_str      pi_images;      // Always hold the images for the currently selected preset and will be updated upon preset change
-td_map_data     pi_data;        // map consisting of key = preset-name, value = vector of all associated images
+td_vec_str      pi_presets;     // Holds all preset-names in alphabetical order
+td_vec_str      pi_images;      // Always holds the images for the currently selected preset and will be updated upon preset change
+td_map_data     pi_data;        // Map consisting of key = preset-name, value = vector of all associated images
 
 
 static const char *img_filter[] = { "*.jpg", "*.png", "*.jpeg" };
@@ -399,7 +403,7 @@ extern "C" void Render() {
 
         // Finally we draw all of our bars
         // The mirrored bars will get drawn within the "draw_bars".
-        // This needs to be done to ensure the exactm same height-value for both
+        // This needs to be done to ensure the exact same height-value for both
         // the left and the (mirrored) right bar
         glPushMatrix();
             glColor3f( 1.0f, 1.0f, 1.0f );
@@ -445,6 +449,10 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     }
 }
 
+// The includes and variables are defined here just because I'm still not too keen on the whole
+// rfft thing
+// At some point it might make sense to switch to FFTW for better performance once a proper spectrum
+// is in place
 #include "mrfft.h"
 #include <memory>
 std::unique_ptr<MRFFT> m_transform;
@@ -456,7 +464,7 @@ extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *
     float freq_data[iFreqDataLength];
 
     // This part is essentially the same as what Kodi would do if we'd set "pInfo->bWantsFreq = true" (in the GetInfo methode)
-    // However, even tough Kodi can do windowing (Hann window) the set the flag to do it  to "false" (hardcoded).
+    // However, even though Kodi can do windowing (Hann window) they set the flag for it to "false" (hardcoded).
     // So I just copied the "rfft.h" and "rfft.cpp", renamed the classe to "MRFFT" (otherwise we'd use the original) and set
     // the flag to "true".
     // Further this gives us the ability to change the response if needed (They return the magnitude per default I believe)
