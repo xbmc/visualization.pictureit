@@ -160,7 +160,6 @@ void load_data( const char* path ) {
 
 
     td_vec_str images;
-    srand( time(0) ); // used to shuffle the images-vector later on
 
     if ( ! pi_presets.empty() ) {
         for ( unsigned int i = 0; i < pi_presets.size(); i++ ) {
@@ -434,6 +433,9 @@ extern "C" void Render() {
 ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
+    
+    // Seed the psuedo-random number generator
+    std::srand( time(0) );
 
     return ADDON_STATUS_NEED_SETTINGS;
 }
