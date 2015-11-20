@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
-    <category label="20000">
-	    <setting    id="presets_root_dir"       label="20001"   type="folder"   source="auto"   option="writeable"/>
-        <setting    id="fade_time_ms"           label="20002"   type="slider"   option="int"    default="2"     range="1,5" />
-	    <setting    id="update_on_new_track"    label="20003"   type="bool"     default="true"  />
-	    <setting    id="update_by_interval"     label="20004"   type="bool"     default="true"  />
-	    <setting    id="img_update_interval"    label="20005"   type="slider"   option="int"    default="10"     range="1,15" enable="eq(-1,true)"  />
+    <category label="30000">
+	    <setting    id="presets_root_dir"       label="30001"   type="folder"   source="auto"   option="writeable"/>
+        <setting    id="fade_time_ms"           label="30002"   type="slider"   option="int"    default="2"     range="250,250,5000" />
+	    <setting    id="update_on_new_track"    label="30003"   type="bool"     default="true"  />
+	    <setting    id="update_by_interval"     label="30004"   type="bool"     default="true"  />
+	    <setting    id="img_update_interval"    label="30005"   type="slider"   option="int"    default="10"     range="5,5,600" enable="eq(-1,true)"  />
     </category>
     
-    <category label="30000">
-        <setting    id="vis_enabled"            label="30001"   type="bool"     default="true"  />
-        <setting    id="vis_bg_enabled"         label="30002"   type="bool"     default="true"  enable="eq(-1,true)"   />
-        <setting    id="vis_half_width"         label="30003"   type="slider"   option="int"    default="90"    range="60,100"   enable="eq(-2,true)"   />
-        <setting    id="vis_bottom_edge"        label="30004"   type="slider"   option="int"    default="1"     range="0,10"     enable="eq(-3,true)"   />
-        <setting    id="vis_animation_speed"    label="30005"   type="slider"   option="int"    default="70"    range="50,100"   enable="eq(-4,true)"   />
+    <category label="30006">
+        <setting    id="vis_enabled"            label="30007"   type="bool"     default="true"  />
+        <setting    id="vis_bg_enabled"         label="30008"   type="bool"     default="true"  enable="eq(-1,true)"   />
+        <setting    id="vis_half_width"         label="30009"   type="slider"   option="int"    default="90"    range="60,100"   enable="eq(-2,true)"   />
+        <setting    id="vis_bottom_edge"        label="30010"   type="slider"   option="int"    default="1"     range="0,10"     enable="eq(-3,true)"   />
+        <setting    id="vis_animation_speed"    label="30011"   type="slider"   option="int"    default="70"    range="50,100"   enable="eq(-4,true)"   />
     </category>
 
 </settings>

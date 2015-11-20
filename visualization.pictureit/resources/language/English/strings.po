@@ -17,50 +17,50 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 
-msgctxt "#20000"
+msgctxt "#30000"
 msgid "General"
 msgstr ""
 
-msgctxt "#20001"
+msgctxt "#30001"
 msgid "Presets root directory"
 msgstr ""
 
-msgctxt "#20002"
-msgid "Transition time (sec.)"
-msgstr ""
-
-msgctxt "#20003"
-msgid "Update on new track"
-msgstr ""
-
-msgctxt "#20004"
-msgid "Update by intervall"
-msgstr ""
-
-msgctxt "#20005"
-msgid "Image update interval (min.)"
-msgstr ""
-
-msgctxt "#30000"
-msgid "Spectrum"
-msgstr ""
-
-msgctxt "#30001"
-msgid "Enable spectrum"
-msgstr ""
-
 msgctxt "#30002"
-msgid "Show spectrum background"
+msgid "Transition time (ms)"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Width"
+msgid "Update on new track"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Padding bottom"
+msgid "New image by intervall"
 msgstr ""
 
 msgctxt "#30005"
+msgid "Image update interval (sec)"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Spectrum"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Enable spectrum"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Show spectrum background"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Width"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Padding bottom"
+msgstr ""
+
+msgctxt "#30011"
 msgid "Animation speed"
 msgstr ""

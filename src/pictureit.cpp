@@ -676,10 +676,10 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
         update_by_interval = *(bool*)value;
 
     if ( str == "img_update_interval" )
-        img_update_interval = (*(int*) value) * 60;
+        img_update_interval = *(int*) value;
 
     if ( str == "fade_time_ms" )
-        fade_time_ms = (*(int*) value) * 1000;
+        fade_time_ms = *(int*) value;
 
     if ( str == "vis_enabled" )
         vis_enabled = *(bool*)value;
