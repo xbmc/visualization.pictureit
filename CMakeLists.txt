@@ -8,11 +8,9 @@ find_package(kodi REQUIRED)
 find_package(OpenGL)
 
 if(OPENGL_FOUND)
-  find_package(SOIL REQUIRED)
-  set(INCLUDES ${OpenGL_INCLUDE_DIR}
-               ${SOIL_INCLUDE_DIRS})
+  set(INCLUDES ${OpenGL_INCLUDE_DIR})
   add_definitions(-DHAS_OPENGL -DHAS_GL)
-  set(DEPLIBS ${OPENGL_LIBRARIES} ${SOIL_LIBRARIES})
+  set(DEPLIBS ${OPENGL_LIBRARIES})
 else()
   message(FATAL_ERROR "No rendering API found. Bailing")
 endif()

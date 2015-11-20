@@ -14,7 +14,9 @@
 #include <fnmatch.h>
 
 #include <GL/gl.h>
-#include "SOIL.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 /*
 * "img_tex_ids" holds the texture-ids for images:
@@ -26,7 +28,8 @@ GLuint                 img_tex_ids[3]          =    {};
 
 bool                   update_img              =    false;               // When set to "true", a new image will be crossfaded
 
-const char*            presets_root_dir        =    "";                  // Root directory holding subfolders that will be used as presets and searched for images
+const char*            presets_root_dir        =    "";                  // Root directory holding subfolders that will be used
+                                                                         // as presets and searched for images
 unsigned int           presets_count           =    0;                   // Amount of presets (subfolders) found
 unsigned int           preset_index            =    0;                   // Index of the currently selected preset
 bool                   preset_random           =    false;               // If random preset is active
@@ -42,16 +45,20 @@ time_t                 img_last_updated        =    time(0);             // Time
 GLfloat                fade_last               =    0.0f;                // The last alpha value of our image
 GLfloat                fade_current            =    0.0f;                // The current alpha value of our image
 int                    fade_time_ms            =    2000;                // How long the crossfade between two images will take (in ms)
-int                    fade_offset_ms          =    0;                   // Used in combination with "fade_time_ms" to calculate the new alpha value for the next frame
+int                    fade_offset_ms          =    0;                   // Used in combination with "fade_time_ms" to calculate the new
+                                                                         // alpha value for the next frame
 
 int                    vis_enabled             =    true;                // If the spectrum is enabled (Kodi setting)
 int                    vis_bg_enabled          =    true;                // If the transparent background behind the spectrum is enabled (Kodi setting)
-const int              vis_bar_count           =    96;                  // Amount of single bars to display (will be doubled as we mirror them to the right side)
-GLfloat                vis_width               =    0.8f;                // Used to define some "padding" left and right. If set to 1.0 the bars will go to the screen edge (Kodi setting)
+const int              vis_bar_count           =    96;                  // Amount of single bars to display (will be doubled as we
+                                                                         // mirror them to the right side)
+GLfloat                vis_width               =    0.8f;                // Used to define some "padding" left and right. If set to 1.0 the bars
+                                                                         // will go to the screen edge (Kodi setting)
 GLfloat                vis_bottom_edge         =    0.98f;               // If set to 1.0 the bars would be exactly on the screen edge (Kodi setting)
 const GLfloat          vis_bar_min_height      =    0.02f;               // The min height for each bar
 const GLfloat          vis_bar_max_height      =    0.18f;               // The max height for each bar
-GLfloat                vis_animation_speed     =    0.007f;              // Animation speed. The smaler the value, the slower AND smoother the animations (Kodi setting)
+GLfloat                vis_animation_speed     =    0.007f;              // Animation speed. The smaler the value, the slower AND smoother the
+                                                                         // animations (Kodi setting)
 const float            vis_bottom_edge_scale[] =    { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
 
 // In here we store the audiodata used to "visualize" our bars.
@@ -209,14 +216,19 @@ GLuint load_image( GLuint img_tex_id = 0 ) {
     if ( pi_images.empty() )
         return 0;
 
-    int pos = get_next_img_pos();
-    if ( ! img_tex_id )
-        img_tex_id = SOIL_load_OGL_texture( pi_images[pos].c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y );
-    else
-        img_tex_id = SOIL_load_OGL_texture( pi_images[pos].c_str(), SOIL_LOAD_AUTO, img_tex_id, SOIL_FLAG_INVERT_Y );
+    int x, y, n;
+    unsigned char *data = stbi_load(pi_images[get_next_img_pos()].c_str(), &x, &y, &n, 0);
 
-    if ( ! img_tex_id )
+    if(data == nullptr)
         return 0;
+
+    GLuint texture[1];
+    glGenTextures(1, texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    stbi_image_free(data);
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
@@ -225,7 +237,7 @@ GLuint load_image( GLuint img_tex_id = 0 ) {
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    return img_tex_id;
+    return texture[0];
 }
 
 // Draw the image with a certain opacity (opacity is used to cross-fade two images)
@@ -246,10 +258,10 @@ void draw_image( GLuint img_tex_id, float opacity ) {
         glColor4f( 1.0f, 1.0f, 1.0f, opacity );
 
     glBegin( GL_QUADS );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex2f( -1.0f, -1.0f );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex2f(  1.0f, -1.0f );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex2f(  1.0f,  1.0f );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex2f( -1.0f,  1.0f );
+        glTexCoord2f( 1.0f, 0.0f ); glVertex2f( -1.0f, -1.0f );  // Top Left
+        glTexCoord2f( 0.0f, 0.0f ); glVertex2f(  1.0f, -1.0f );  // Top Right
+        glTexCoord2f( 0.0f, 1.0f ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
+        glTexCoord2f( 1.0f, 1.0f ); glVertex2f( -1.0f,  1.0f );  // Bottom Left
     glEnd();
 
     glDisable( GL_TEXTURE_2D );
@@ -344,7 +356,8 @@ extern "C" void Render() {
         GLuint tex_id = load_image( img_tex_ids[2] );
 
         if ( tex_id ) {
-            // Load a new image to the next position.
+            // If a new image was loaded sucessfully, we set it's texture-id to the second position
+            // of our array which will be for crossfading
             img_tex_ids[1] = tex_id;
         } else {
             // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
@@ -355,7 +368,6 @@ extern "C" void Render() {
 
         fade_current = 0.0f;
         fade_offset_ms = get_current_time_ms() % fade_time_ms;
-
     }
 
     // If we are within a crossfade, fade out the current image
@@ -377,9 +389,8 @@ extern "C" void Render() {
 
             // Display the next image from now on.
             img_tex_ids[0] = img_tex_ids[1];
-        } else {
+        } else
             fade_last = fade_current;
-        }
 
         draw_image( img_tex_ids[1], fade_current );
     }
