@@ -258,10 +258,10 @@ void draw_image( GLuint img_tex_id, float opacity ) {
         glColor4f( 1.0f, 1.0f, 1.0f, opacity );
 
     glBegin( GL_QUADS );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex2f( -1.0f, -1.0f );  // Top Left
-        glTexCoord2f( 0.0f, 0.0f ); glVertex2f(  1.0f, -1.0f );  // Top Right
-        glTexCoord2f( 0.0f, 1.0f ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
-        glTexCoord2f( 1.0f, 1.0f ); glVertex2f( -1.0f,  1.0f );  // Bottom Left
+        glTexCoord2f( 0.0f, 0.0f ); glVertex2f( -1.0f, -1.0f );  // Top Left
+        glTexCoord2f( 1.0f, 0.0f ); glVertex2f(  1.0f, -1.0f );  // Top Right
+        glTexCoord2f( 1.0f, 1.0f ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
+        glTexCoord2f( 0.0f, 1.0f ); glVertex2f( -1.0f,  1.0f );  // Bottom Left
     glEnd();
 
     glDisable( GL_TEXTURE_2D );
