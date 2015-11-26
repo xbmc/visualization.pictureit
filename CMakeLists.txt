@@ -1,38 +1,30 @@
+cmake_minimum_required(VERSION 2.6)
 project(visualization.pictureit)
 
-cmake_minimum_required(VERSION 2.6)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
 find_package(kodi REQUIRED)
-find_package(OpenGL)
 
-if(OPENGL_FOUND)
-  set(INCLUDES ${OpenGL_INCLUDE_DIR})
-  add_definitions(-DHAS_OPENGL -DHAS_GL)
-  set(DEPLIBS ${OPENGL_LIBRARIES})
-else()
-  message(FATAL_ERROR "No rendering API found. Bailing")
-endif()
+# Include PictureIt
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_BINARY_DIR}/depends)
+add_subdirectory(${PROJECT_SOURCE_DIR}/depends/PictureIt)
+find_package(PictureIt REQUIRED)
+if(PictureIt_FOUND)
+    list(APPEND INCLUDES ${PICTUREIT_INCLUDE_DIRS})
+    list(APPEND DEPLIBS PictureIt)
+else(PictureIt_FOUND)
+    message(FATAL_ERROR "PictureIt not found!")
+endif(PictureIt_FOUND)
 
-include_directories(${INCLUDES}
-                    ${KODI_INCLUDE_DIR}
-                    ${PROJECT_SOURCE_DIR}/lib/kissfft
-                    ${CMAKE_INCLUDE_PATH})
+include_directories(${INCLUDES})
+include_directories(${KODI_INCLUDE_DIR})
 
-add_subdirectory(lib/kissfft)
-
-set(PICTUREIT_SOURCES src/mrfft.cpp
-                      src/pictureit.cpp)
-
-list(APPEND DEPLIBS kissfft)
+set(ADDON_SOURCES ${PROJECT_SOURCE_DIR}/src/pictureit_addon.cpp)
 
 if(APPLE)
-  set(DEPLIBS ${DEPLIBS} "-framework CoreVideo")
-endif()
+    list(APPEND DEPLIBS "-framework CoreVideo")
+endif(APPLE)
 
-add_options(CXX ALL_BUILDS -std=c++11)
-
-build_addon(visualization.pictureit PICTUREIT DEPLIBS)
+build_addon(visualization.pictureit ADDON DEPLIBS)
 
 include(CPack)

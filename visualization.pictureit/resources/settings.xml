@@ -9,7 +9,7 @@
     </category>
     
     <category label="30006">
-        <setting    id="vis_enabled"            label="30007"   type="bool"     default="true"  />
+        <setting    id="spectrum_enabled"       label="30007"   type="bool"     default="true"  />
         <setting    id="vis_bg_enabled"         label="30008"   type="bool"     default="true"  enable="eq(-1,true)"   />
         <setting    id="vis_half_width"         label="30009"   type="slider"   option="int"    default="90"    range="60,100"   enable="eq(-2,true)"   />
         <setting    id="vis_bottom_edge"        label="30010"   type="slider"   option="int"    default="1"     range="0,10"     enable="eq(-3,true)"   />
