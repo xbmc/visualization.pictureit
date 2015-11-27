@@ -6,8 +6,8 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 find_package(kodi REQUIRED)
 
 # Include PictureIt
-list(APPEND CMAKE_PREFIX_PATH ${PROJECT_BINARY_DIR}/depends)
-add_subdirectory(${PROJECT_SOURCE_DIR}/depends/PictureIt)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_BINARY_DIR}/depends/common)
+add_subdirectory(${PROJECT_SOURCE_DIR}/depends/common/PictureIt)
 find_package(PictureIt REQUIRED)
 if(PictureIt_FOUND)
     list(APPEND INCLUDES ${PICTUREIT_INCLUDE_DIRS})
