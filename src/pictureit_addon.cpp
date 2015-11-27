@@ -1,6 +1,6 @@
 #include "xbmc_vis_dll.h"
-#include "pictureit/pictureit.h"
-#include "pictureit/utils.h"
+#include "pictureit.h"
+#include "utils.h"
 
 #include <algorithm>
 

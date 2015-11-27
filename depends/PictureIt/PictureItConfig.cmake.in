@@ -1,7 +1,0 @@
-# - Config file for the PictureIt package
-# It defines the following variables
-#  PICTUREIT_INCLUDE_DIRS - include directories for FooBar
- 
-# Compute paths
-get_filename_component(PICTUREIT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(PICTUREIT_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
