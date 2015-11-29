@@ -14,7 +14,7 @@ include_directories(${KODI_INCLUDE_DIR})
 # Find and include PictureIt
 find_package(PictureIt REQUIRED)
 include_directories(${PICTUREIT_INCLUDE_DIRS})
-list(APPEND DEPLIBS ${PICTUREIP_LIB_DIR})
+list(APPEND DEPLIBS ${PICTUREIT_LIB_DIR})
 
 
 set(ADDON_SOURCES ${PROJECT_SOURCE_DIR}/src/pictureit_addon.cpp)
