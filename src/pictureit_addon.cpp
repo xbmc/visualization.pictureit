@@ -280,7 +280,7 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
 
     else if ( str == "vis_bottom_edge" ) {
         float scale[] = { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
-        pictureit->spectrum_position = cale[(*(int*) value)];
+        pictureit->spectrum_position = scale[(*(int*) value)];
     }
 
     else if ( str == "vis_animation_speed" )
