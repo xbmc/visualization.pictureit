@@ -20,7 +20,6 @@ unsigned int           preset_index            =    0;                   // Inde
 bool                   preset_random           =    false;               // If random preset is active
 bool                   preset_locked           =    false;               // If current preset is locked
 
-
 bool                   update_on_new_track     =    true;                // If we should update on new track (Kodi setting)
 int                    fade_time_ms            =    2000;                // How long the crossfade between two images will take (in ms)
 
@@ -262,7 +261,7 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
         update_on_new_track = *(bool*)value;
 
     else if ( str == "update_by_interval" )
-        pictureit->update_by_interval = *(bool*)value;
+        pictureit->img_update_by_interval = *(bool*)value;
 
     else if ( str == "img_update_interval" )
         pictureit->img_update_interval = *(int*) value;
@@ -281,11 +280,11 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
 
     else if ( str == "vis_bottom_edge" ) {
         float scale[] = { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
-        vis_bottom_edge = scale[(*(int*) value)];
+        pictureit->spectrum_position = cale[(*(int*) value)];
     }
 
     else if ( str == "vis_animation_speed" )
-        vis_animation_speed = (*(int*) value) * 0.005f / 100;
+        pictureit->spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
 
     return ADDON_STATUS_OK;
 }
