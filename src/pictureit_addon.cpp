@@ -9,51 +9,70 @@ using namespace std;
 
 PictureIt *pictureit = NULL;
 
-vector<string> pi_presets;     // Holds all preset-names in alphabetical order
+const char* img_directory   =   NULL;
+const char* img_effect      =   NULL;
 
-const char*            presets_root_dir        =    "";                  // Root directory holding subfolders that will be used
-                                                                         // as presets and searched for images
-unsigned int           presets_count           =    0;                   // Amount of presets (subfolders) found
-unsigned int           preset_index            =    0;                   // Index of the currently selected preset
-bool                   preset_random           =    false;               // If random preset is active
-bool                   preset_locked           =    false;               // If current preset is locked
+bool    img_pick_random         = false;
+bool    img_update_by_interval  = false;
+int     img_update_interval     = 0;
 
-bool                   update_on_new_track     =    true;                // If we should update on new track (Kodi setting)
-int                    fade_time_ms            =    2000;                // How long the crossfade between two images will take (in ms)
+bool    spectrum_enabled    =   false;
+int     spectrum_bar_count  =   0;
+float   spectrum_width      =   0;
+float   spectrum_position   =   0;
 
-int                    vis_bg_enabled          =    true;                // If the transparent background behind the spectrum is enabled (Kodi setting)
-const int              vis_bar_count           =    96;                  // Amount of single bars to display (will be doubled as we
-                                                                         // mirror them to the right side)
-GLfloat                vis_bottom_edge         =    0.98f;               // If set to 1.0 the bars would be exactly on the screen edge (Kodi setting)
-const GLfloat          vis_bar_min_height      =    0.02f;               // The min height for each bar
-const GLfloat          vis_bar_max_height      =    0.18f;               // The max height for each bar
-GLfloat                vis_animation_speed     =    0.007f;              // Animation speed. The smaler the value, the slower AND smoother the
-                                                                         // animations (Kodi setting)
-const float            vis_bottom_edge_scale[] =    { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
+bool    spectrum_mirror_vertical    = false;
+bool    spectrum_mirror_horizontal  = false;
+float   spectrum_animation_speed    = 0;
 
 
+bool    preset_pick_random  =   false;
+bool    img_update_by_track =   false;
+
+
+unsigned int    presets_count   =    0;
+unsigned int    preset_index    =    0;
+bool            preset_random   =    false;
+bool            preset_locked   =    false;
+
+vector<string> PRESETS; // Holds all preset-names in alphabetical order
 
 void load_presets() {
-    PI_UTILS::list_dir( presets_root_dir, pi_presets, false, false, NULL, 0 );
-    sort( pi_presets.begin(), pi_presets.end() );
+    PI_UTILS::list_dir( img_directory, PRESETS, false, false, NULL, 0 );
+    sort( PRESETS.begin(), PRESETS.end() );
 }
 
 // Select preset at "index"
 void select_preset( unsigned int index ) {
-    if ( index >= pi_presets.size() )
+    if ( index >= PRESETS.size() )
         return;
 
     preset_index = index;
 
-    pictureit->load_images(PI_UTILS::path_join(presets_root_dir, pi_presets[preset_index]));
+    pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
     pictureit->update_image();
+}
+
+void configure_efx( const char* efx_name ) {
+    string efx = efx_name;
+
+    if ( efx == "Crossfade" ) {
+        pictureit->set_img_efx(EFXS::CROSSFADE);
+        pictureit->EFX->configure("fade_time_ms", 250);
+    }
+    
+    else if ( efx == "Slide" ) {
+        pictureit->set_img_efx(EFXS::SLIDE);
+        pictureit->EFX->configure("fade_time_ms", 250);
+    }
 }
 
 //-- Render -------------------------------------------------------------------
 // Called once per frame. Do all rendering here.
 //-----------------------------------------------------------------------------
 extern "C" void Render() {
-    pictureit->render();
+    if ( pictureit != NULL)
+        pictureit->render();
 }
 
 //-- Create -------------------------------------------------------------------
@@ -63,29 +82,44 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
 
-    pictureit = new PictureIt(64);
-    pictureit->init();
-
     return ADDON_STATUS_NEED_SETTINGS;
 }
 
 extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName) {
-    pictureit->EFX->configure("fade_time_ms", fade_time_ms);
+    pictureit = new PictureIt( spectrum_bar_count );
+
+    configure_efx( img_effect );
+
+    pictureit->img_pick_random              = img_pick_random;
+    pictureit->img_update_by_interval       = img_update_by_interval;
+    pictureit->img_update_interval          = img_update_interval;
+
+    pictureit->spectrum_enabled             = spectrum_enabled;
+    pictureit->spectrum_position            = spectrum_position;
+    pictureit->spectrum_width               = spectrum_width;
+    pictureit->spectrum_mirror_vertical     = spectrum_mirror_vertical;
+    pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
+    pictureit->spectrum_animation_speed     = spectrum_animation_speed;
 
     // Now we should have the user-settings loaded so we can try and get our presets
-    if ( pi_presets.empty() ) {
+    if ( PRESETS.empty() ) {
         load_presets();
 
         // If we have some data, we select a random preset
-        if ( ! pi_presets.empty() ) {
-            select_preset( rand() % pi_presets.size() );
-            pictureit->load_images(PI_UTILS::path_join(presets_root_dir, pi_presets[preset_index]));
+        if ( ! PRESETS.empty() ) {
+            if (preset_pick_random)
+                select_preset( rand() % PRESETS.size() );
+            else
+                select_preset( 0 );
+
+            pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
         }
     }
 }
 
 extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *pFreqData, int iFreqDataLength) {
-    pictureit->audio_data(pAudioData, iAudioDataLength);
+    if ( pictureit != NULL)
+        pictureit->audio_data(pAudioData, iAudioDataLength);
 }
 
 
@@ -121,10 +155,10 @@ extern "C" bool OnAction(long flags, const void *param) {
         case VIS_ACTION_NEXT_PRESET:
             if ( ! preset_locked ) {
                 if ( preset_random ) {
-                        select_preset( rand() % pi_presets.size() );
+                        select_preset( rand() % PRESETS.size() );
                 } else {
                     preset_index += 1;
-                    if ( preset_index >= pi_presets.size() )
+                    if ( preset_index >= PRESETS.size() )
                         preset_index = 0;
                 }
             }
@@ -132,11 +166,11 @@ extern "C" bool OnAction(long flags, const void *param) {
         case VIS_ACTION_PREV_PRESET:
             if ( ! preset_locked ) {
                 if ( preset_random ) {
-                        select_preset( rand() % pi_presets.size() );
+                        select_preset( rand() % PRESETS.size() );
                 } else {
                     preset_index -= 1;
                     if ( preset_index < 0 )
-                        preset_index = pi_presets.size();
+                        preset_index = PRESETS.size();
                 }
             }
             break;
@@ -147,7 +181,7 @@ extern "C" bool OnAction(long flags, const void *param) {
             preset_locked = !preset_locked;
             break;
         case VIS_ACTION_UPDATE_TRACK:
-            if ( update_on_new_track )
+            if ( img_update_by_track )
                 pictureit->update_image();
             break;
         default:
@@ -162,17 +196,17 @@ extern "C" bool OnAction(long flags, const void *param) {
 // Return a list of presets to XBMC for display
 //-----------------------------------------------------------------------------
 extern "C" unsigned int GetPresets(char ***presets) {
-    if ( pi_presets.empty() )
+    if ( PRESETS.empty() )
         load_presets();
 
-    if ( pi_presets.empty() )
+    if ( PRESETS.empty() )
         return 0;
 
-    presets_count = pi_presets.size();
+    presets_count = PRESETS.size();
     char **g_presets = (char**) malloc( sizeof(char*) * presets_count );
 
     for( unsigned int i = 0; i < presets_count; i++ )
-        g_presets[i] = (char*) pi_presets[i].c_str();
+        g_presets[i] = (char*) PRESETS[i].c_str();
 
     *presets = g_presets;
 
@@ -248,42 +282,55 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
 
     string str = strSetting;
 
-    if ( str == "presets_root_dir" ) {
+    /** Background related **/
+    if ( str == "img.directory" ) {
         const char* dir = (const char*) value;
-        if ( dir && !dir[0] )
+        if ( (dir != NULL) && ( dir[0] == '\0' ) )
             return ADDON_STATUS_NEED_SETTINGS;
 
-        presets_root_dir = dir;
+        img_directory = dir;
     }
 
-    if ( str == "update_on_new_track" )
-        update_on_new_track = *(bool*)value;
+    else if ( str == "img.effect")
+        img_effect = (const char*) value;
 
-    else if ( str == "update_by_interval" )
-        pictureit->img_update_by_interval = *(bool*)value;
+    else if ( str == "img.pick_random" )
+        img_pick_random = *(bool*)value;
 
-    else if ( str == "img_update_interval" )
-        pictureit->img_update_interval = *(int*) value;
+    else if ( str == "preset.pick_random" )
+        preset_pick_random = *(bool*)value;
 
-    else if ( str == "fade_time_ms" )
-        fade_time_ms = *(int*) value;
+    else if ( str == "img.update_by_track" )
+        img_update_by_track = *(bool*)value;
 
-    else if ( str == "spectrum_enabled" )
-        pictureit->spectrum_enabled = *(bool*)value;
+    else if ( str == "img.update_by_interval" )
+        img_update_by_interval = *(bool*)value;
 
-    else if ( str == "vis_bg_enabled" )
-        vis_bg_enabled = *(bool*)value;
+    else if ( str == "img.update_interval" )
+        img_update_interval = *(int*) value;
 
-    else if ( str == "vis_half_width" )
-        pictureit->spectrum_width = ((*(int*) value) * 1.0f / 100);
 
-    else if ( str == "vis_bottom_edge" ) {
-        float scale[] = { 1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80 };
-        pictureit->spectrum_position = scale[(*(int*) value)];
-    }
+    /** Spectrum related **/
+    else if ( str == "spectrum.enabled" )
+        spectrum_enabled = *(bool*)value;
 
-    else if ( str == "vis_animation_speed" )
-        pictureit->spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
+    else if ( str == "spectrum.bar_count" )
+        spectrum_bar_count = (*(int*) value);
+
+    else if ( str == "spectrum.width" )
+        spectrum_width = ((*(int*) value) * 1.0f / 100);
+
+    else if ( str == "spectrum.position" )
+        spectrum_position = -(*(float*) value);
+
+    else if ( str == "spectrum.mirror_vertical" )
+        spectrum_mirror_vertical = *(bool*)value;
+
+    else if ( str == "spectrum.mirror_horizontal" )
+        spectrum_mirror_horizontal = *(bool*)value;
+
+    else if ( str == "spectrum.animation_speed" )
+        spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
 
     return ADDON_STATUS_OK;
 }

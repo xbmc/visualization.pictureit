@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
+    <!-- Category Background -->
     <category label="30000">
-	    <setting    id="presets_root_dir"       label="30001"   type="folder"   source="auto"   option="writeable"/>
-        <setting    id="fade_time_ms"           label="30002"   type="slider"   option="int"    default="2"     range="250,250,5000" />
-	    <setting    id="update_on_new_track"    label="30003"   type="bool"     default="true"  />
-	    <setting    id="update_by_interval"     label="30004"   type="bool"     default="true"  />
-	    <setting    id="img_update_interval"    label="30005"   type="slider"   option="int"    default="10"     range="5,5,600" enable="eq(-1,true)"  />
+        <setting id="img.directory" label="30001" type="folder" source="local" option="writeable"/>
+        <setting id="img.pick_random" label="30013" type="bool" default="true" />
+        <setting id="preset.pick_random" label="30017" type="bool" default="true" />
+
+        <setting id="img.update_by_track" label="30003" type="bool" default="true" />
+        <setting id="img.update_by_interval" label="30004" type="bool" default="true" />
+        <setting id="img.update_interval" label="30005" type="slider" option="int" default="300" range="5,5,600" enable="eq(-1,true)" />
+
+        <!-- Subcategory Effect -->
+        <setting type="lsep" label="30011" />
+        <setting id="img.effect" type="select" label="30012" values="Crossfade" default="Crossfade" />
+            <!-- Crossfade config -->
+                <setting id="crossfade.fade_ms" label="30002" type="slider" option="int" default="2" range="250,250,5000" visible="eq(-1,Crossfade)" />            
     </category>
     
+    <!-- Category Spectrum -->
     <category label="30006">
-        <setting    id="spectrum_enabled"       label="30007"   type="bool"     default="true"  />
-        <setting    id="vis_bg_enabled"         label="30008"   type="bool"     default="true"  enable="eq(-1,true)"   />
-        <setting    id="vis_half_width"         label="30009"   type="slider"   option="int"    default="90"    range="60,100"   enable="eq(-2,true)"   />
-        <setting    id="vis_bottom_edge"        label="30010"   type="slider"   option="int"    default="1"     range="0,10"     enable="eq(-3,true)"   />
-        <setting    id="vis_animation_speed"    label="30011"   type="slider"   option="int"    default="70"    range="50,100"   enable="eq(-4,true)"   />
+        <setting id="spectrum.enabled" label="30007" type="bool" default="true" />
+
+        <setting id="spectrum.bar_count" label="30008" type="slider" option="int" default="64" range="10,2,100" enable="eq(-1,true)" />
+        <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-2,true)" />
+        <setting id="spectrum.width" label="30010" type="slider" option="int" default="85" range="0,100" enable="eq(-3,true)" />
+        <setting id="spectrum.position" label="30014" type="slider" option="float" default="-0.98" range="-1.0,0.02,1.0" enable="eq(-4,true)" />
+        <setting id="spectrum.mirror_vertical" label="30015" type="bool" default="true"  enable="eq(-5,true)" />
+        <setting id="spectrum.mirror_horizontal" label="30016" type="bool" default="false"  enable="eq(-6,true)" />
     </category>
 
 </settings>

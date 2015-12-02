@@ -18,11 +18,11 @@ msgstr ""
 
 
 msgctxt "#30000"
-msgid "General"
+msgid "Background"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Presets root directory"
+msgid "Backgrounds directory (Subdirectories become Presets)"
 msgstr ""
 
 msgctxt "#30002"
@@ -30,15 +30,15 @@ msgid "Transition time (ms)"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Update on new track"
+msgid "Update background on new track"
 msgstr ""
 
 msgctxt "#30004"
-msgid "New image by intervall"
+msgid "Update background by interval"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Image update interval (sec)"
+msgid "Background update interval (sec)"
 msgstr ""
 
 msgctxt "#30006"
@@ -46,21 +46,45 @@ msgid "Spectrum"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Enable spectrum"
+msgid "Enable Spectrum"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Show spectrum background"
+msgid "Amount of bars (doesn't include the mirrored parts)"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Width"
+msgid "Animation speed"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Padding bottom"
+msgid "Width"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Animation speed"
+msgid "Transition Effect"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Effect"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Pick random images"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Position"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Mirror vertical"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Mirror horizontal"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Pick random preset on startup"
 msgstr ""
