@@ -1,11 +1,9 @@
 #include "xbmc_vis_dll.h"
-#include "pictureit.h"
-#include "utils.h"
+
+#include "PictureIt/pictureit.h"
+#include "PictureIt/utils.h"
 
 #include <algorithm>
-
-
-//#include <GL/gl.h>
 
 using namespace std;
 
@@ -65,14 +63,13 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
 
-    pictureit = new PictureIt();
+    pictureit = new PictureIt(64);
+    pictureit->init();
 
     return ADDON_STATUS_NEED_SETTINGS;
 }
 
 extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName) {
-    pictureit->init();
-
     pictureit->EFX->configure("fade_time_ms", fade_time_ms);
 
     // Now we should have the user-settings loaded so we can try and get our presets
@@ -155,6 +152,7 @@ extern "C" bool OnAction(long flags, const void *param) {
             break;
         default:
             ret = false;
+            break;
     }
 
     return ret;
@@ -254,6 +252,7 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
         const char* dir = (const char*) value;
         if ( dir && !dir[0] )
             return ADDON_STATUS_NEED_SETTINGS;
+
         presets_root_dir = dir;
     }
 
