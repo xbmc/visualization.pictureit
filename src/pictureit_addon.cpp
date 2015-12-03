@@ -105,10 +105,7 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
     pictureit->spectrum_animation_speed     = spectrum_animation_speed;
 
-    printf("img dir: %s\n", img_directory);
     load_presets();
-    printf("presets count: %i\n", PRESETS.size());
-    printf("img dir: %s\n", img_directory);
 
     // If we have some data, we select a preset
     if ( ! PRESETS.empty() ) {
