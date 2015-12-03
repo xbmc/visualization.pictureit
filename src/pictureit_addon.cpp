@@ -1,4 +1,5 @@
-#include "xbmc_vis_dll.h"
+#include <xbmc_vis_dll.h>
+#include <libXBMC_addon.h>
 
 #include "PictureIt/pictureit.h"
 #include "PictureIt/utils.h"
@@ -8,9 +9,10 @@
 using namespace std;
 
 PictureIt *pictureit = NULL;
+ADDON::CHelper_libXBMC_addon *KODI = NULL;
 
-const char* img_directory   =   NULL;
-const char* img_effect      =   NULL;
+char img_directory[1024]    =   "";
+char img_effect[32]         =   "";
 
 bool    img_pick_random         = false;
 bool    img_update_by_interval  = false;
@@ -18,19 +20,18 @@ int     img_update_interval     = 0;
 
 bool    spectrum_enabled    =   false;
 int     spectrum_bar_count  =   0;
-float   spectrum_width      =   0;
-float   spectrum_position   =   0;
+float   spectrum_width      =   0.0f;
+float   spectrum_position   =   0.0f;
 
 bool    spectrum_mirror_vertical    = false;
 bool    spectrum_mirror_horizontal  = false;
-float   spectrum_animation_speed    = 0;
+float   spectrum_animation_speed    = 0.0f;
 
 
 bool    preset_pick_random  =   false;
 bool    img_update_by_track =   false;
 
 
-unsigned int    presets_count   =    0;
 unsigned int    preset_index    =    0;
 bool            preset_random   =    false;
 bool            preset_locked   =    false;
@@ -44,26 +45,20 @@ void load_presets() {
 
 // Select preset at "index"
 void select_preset( unsigned int index ) {
-    if ( index >= PRESETS.size() )
-        return;
-
-    preset_index = index;
-
-    pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
-    pictureit->update_image();
+    if ( index < PRESETS.size() ) {
+        preset_index = index;
+        pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
+        pictureit->update_image();
+    }
 }
 
-void configure_efx( const char* efx_name ) {
-    string efx = efx_name;
+void set_effect( const char* efx_name ) {
+    if ( strcmp( efx_name, "Crossfade" ) == 0 ) {
+        pictureit->set_img_efx( EFXS::CROSSFADE );
 
-    if ( efx == "Crossfade" ) {
-        pictureit->set_img_efx(EFXS::CROSSFADE);
-        pictureit->EFX->configure("fade_time_ms", 250);
-    }
-    
-    else if ( efx == "Slide" ) {
-        pictureit->set_img_efx(EFXS::SLIDE);
-        pictureit->EFX->configure("fade_time_ms", 250);
+        int crossfade_ms = 0;
+        KODI->GetSetting( "crossfade.fade_ms", &crossfade_ms );
+        pictureit->EFX->configure("fade_time_ms", crossfade_ms);
     }
 }
 
@@ -71,7 +66,7 @@ void configure_efx( const char* efx_name ) {
 // Called once per frame. Do all rendering here.
 //-----------------------------------------------------------------------------
 extern "C" void Render() {
-    if ( pictureit != NULL)
+    if ( pictureit )
         pictureit->render();
 }
 
@@ -82,13 +77,22 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
 
+    if ( !KODI )
+        KODI = new ADDON::CHelper_libXBMC_addon;
+
+    if ( !KODI->RegisterMe(hdl) ) {
+        delete KODI, KODI=NULL;
+
+        return ADDON_STATUS_PERMANENT_FAILURE;
+    }
+
     return ADDON_STATUS_NEED_SETTINGS;
 }
 
 extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, const char* szSongName) {
     pictureit = new PictureIt( spectrum_bar_count );
 
-    configure_efx( img_effect );
+    set_effect( img_effect );
 
     pictureit->img_pick_random              = img_pick_random;
     pictureit->img_update_by_interval       = img_update_by_interval;
@@ -101,24 +105,26 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
     pictureit->spectrum_animation_speed     = spectrum_animation_speed;
 
-    // Now we should have the user-settings loaded so we can try and get our presets
-    if ( PRESETS.empty() ) {
-        load_presets();
+    printf("img dir: %s\n", img_directory);
+    load_presets();
+    printf("presets count: %i\n", PRESETS.size());
+    printf("img dir: %s\n", img_directory);
 
-        // If we have some data, we select a random preset
-        if ( ! PRESETS.empty() ) {
-            if (preset_pick_random)
-                select_preset( rand() % PRESETS.size() );
-            else
-                select_preset( 0 );
-
-            pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
-        }
+    // If we have some data, we select a preset
+    if ( ! PRESETS.empty() ) {
+        if ( preset_pick_random )
+            select_preset( rand() % PRESETS.size() );
+        else
+            select_preset( 0 );
+    } else {
+        // No presets found so we load whatever we find in the current directory
+        pictureit->load_images( img_directory );
+        pictureit->update_image();
     }
 }
 
 extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *pFreqData, int iFreqDataLength) {
-    if ( pictureit != NULL)
+    if ( pictureit )
         pictureit->audio_data(pAudioData, iAudioDataLength);
 }
 
@@ -197,12 +203,9 @@ extern "C" bool OnAction(long flags, const void *param) {
 //-----------------------------------------------------------------------------
 extern "C" unsigned int GetPresets(char ***presets) {
     if ( PRESETS.empty() )
-        load_presets();
-
-    if ( PRESETS.empty() )
         return 0;
 
-    presets_count = PRESETS.size();
+    unsigned int presets_count = PRESETS.size();
     char **g_presets = (char**) malloc( sizeof(char*) * presets_count );
 
     for( unsigned int i = 0; i < presets_count; i++ )
@@ -232,7 +235,8 @@ extern "C" bool IsLocked() {
 // !!! Add-on master function !!!
 //-----------------------------------------------------------------------------
 extern "C" void ADDON_Stop() {
-    delete pictureit;
+    delete KODI, KODI = NULL;
+    delete pictureit, pictureit = NULL;
 }
 
 //-- Destroy ------------------------------------------------------------------
@@ -276,60 +280,57 @@ extern "C" void ADDON_FreeSettings() {}
 // Set a specific Setting value (called from XBMC)
 // !!! Add-on master function !!!
 //-----------------------------------------------------------------------------
-extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* value ) {
-    if ( ! strSetting || ! value )
+extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
+    if ( ! id || ! value )
         return ADDON_STATUS_UNKNOWN;
 
-    string str = strSetting;
-
     /** Background related **/
-    if ( str == "img.directory" ) {
-        const char* dir = (const char*) value;
-        if ( (dir != NULL) && ( dir[0] == '\0' ) )
-            return ADDON_STATUS_NEED_SETTINGS;
-
-        img_directory = dir;
+    if ( strcmp( id, "img.directory" ) == 0 ) {
+        strcpy( img_directory, (const char*) value );
+        if ( ! KODI->CanOpenDirectory(img_directory) )
+            return ADDON_STATUS_PERMANENT_FAILURE;
     }
 
-    else if ( str == "img.effect")
-        img_effect = (const char*) value;
+    else if ( strcmp( id, "img.effect") == 0 )
+        strcpy( img_effect, (const char*) value );
 
-    else if ( str == "img.pick_random" )
-        img_pick_random = *(bool*)value;
+    else if ( strcmp( id, "img.pick_random" ) == 0 )
+        img_pick_random = *(bool*) value;
 
-    else if ( str == "preset.pick_random" )
-        preset_pick_random = *(bool*)value;
+    else if ( strcmp( id, "preset.pick_random" ) == 0 )
+        preset_pick_random = *(bool*) value;
 
-    else if ( str == "img.update_by_track" )
-        img_update_by_track = *(bool*)value;
+    else if ( strcmp( id, "img.update_by_track" ) == 0 )
+        img_update_by_track = *(bool*) value;
 
-    else if ( str == "img.update_by_interval" )
-        img_update_by_interval = *(bool*)value;
+    else if ( strcmp( id, "img.update_by_interval" ) == 0 )
+        img_update_by_interval = *(bool*) value;
 
-    else if ( str == "img.update_interval" )
+    else if ( strcmp( id, "img.update_interval" ) == 0 )
         img_update_interval = *(int*) value;
 
 
     /** Spectrum related **/
-    else if ( str == "spectrum.enabled" )
-        spectrum_enabled = *(bool*)value;
+    else if ( strcmp( id, "spectrum.enabled" ) == 0 )
+        spectrum_enabled = *(bool*) value;
 
-    else if ( str == "spectrum.bar_count" )
+    else if ( strcmp( id, "spectrum.bar_count" ) == 0 )
         spectrum_bar_count = (*(int*) value);
 
-    else if ( str == "spectrum.width" )
-        spectrum_width = ((*(int*) value) * 1.0f / 100);
+    else if ( strcmp( id, "spectrum.width" ) == 0 )
+        spectrum_width = (*(int*) value) * 1.0f / 100;
 
-    else if ( str == "spectrum.position" )
+    else if ( strcmp( id, "spectrum.position" ) == 0 )
+        // We inverse the value just because -1.0 feel more like "bottom" than 1.0
         spectrum_position = -(*(float*) value);
 
-    else if ( str == "spectrum.mirror_vertical" )
-        spectrum_mirror_vertical = *(bool*)value;
+    else if ( strcmp( id, "spectrum.mirror_vertical" ) == 0 )
+        spectrum_mirror_vertical = *(bool*) value;
 
-    else if ( str == "spectrum.mirror_horizontal" )
-        spectrum_mirror_horizontal = *(bool*)value;
+    else if ( strcmp( id, "spectrum.mirror_horizontal" ) == 0 )
+        spectrum_mirror_horizontal = *(bool*) value;
 
-    else if ( str == "spectrum.animation_speed" )
+    else if ( strcmp( id, "spectrum.animation_speed" ) == 0 )
         spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
 
     return ADDON_STATUS_OK;
@@ -339,4 +340,4 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
 // Receive announcements from XBMC
 // !!! Add-on master function !!!
 //-----------------------------------------------------------------------------
-extern "C" void ADDON_Announce( const char *flag, const char *sender, const char *message, const void *pi_data ) {}
+extern "C" void ADDON_Announce( const char *flag, const char *sender, const char *message, const void *data ) {}
