@@ -4,7 +4,8 @@
     <category label="30000">
         <setting id="img.directory" label="30001" type="folder" source="local" option="writeable"/>
         <setting id="img.pick_random" label="30013" type="bool" default="true" />
-        <setting id="preset.pick_random" label="30017" type="bool" default="true" />
+        <setting id="preset.enabled" label="30018" type="bool" default="true" />
+        <setting id="preset.pick_random" label="30017" type="bool" default="true" enable="eq(-1,true)"/>
 
         <setting id="img.update_by_track" label="30003" type="bool" default="true" />
         <setting id="img.update_by_interval" label="30004" type="bool" default="true" />

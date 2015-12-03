@@ -28,6 +28,7 @@ bool    spectrum_mirror_horizontal  = false;
 float   spectrum_animation_speed    = 0.0f;
 
 
+bool    preset_enabled      =   false;
 bool    preset_pick_random  =   false;
 bool    img_update_by_track =   false;
 
@@ -105,7 +106,8 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
     pictureit->spectrum_animation_speed     = spectrum_animation_speed;
 
-    load_presets();
+    if ( preset_enabled )
+        load_presets();
 
     // If we have some data, we select a preset
     if ( ! PRESETS.empty() ) {
@@ -293,6 +295,9 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
 
     else if ( strcmp( id, "img.pick_random" ) == 0 )
         img_pick_random = *(bool*) value;
+
+    else if ( strcmp( id, "preset.enabled" ) == 0 )
+        preset_enabled = *(bool*) value;
 
     else if ( strcmp( id, "preset.pick_random" ) == 0 )
         preset_pick_random = *(bool*) value;

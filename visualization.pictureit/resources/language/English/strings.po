@@ -88,3 +88,7 @@ msgstr ""
 msgctxt "#30017"
 msgid "Pick random preset on startup"
 msgstr ""
+
+msgctxt "#30018"
+msgid "Use first level of subfolders as presets"
+msgstr ""
