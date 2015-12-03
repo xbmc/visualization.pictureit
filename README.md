@@ -17,13 +17,10 @@ Simple right?
  * Change the spectrums: Width, Bottom-Padding, Animation-Speed
 
 ## Installation
- 1. Install SOIL on your system
-      * Ubuntu:   `apt-get install libsoil1`
-      * Arch:     `pacaur -S soil`
- 2. Install the [linuxwhatelse repository](http://linuxwhatelse.de/projects/kodi/repo/repository.linuxwhatelse.zip)
- 3. Install PictureIt
- 4. In the add-on configuration set the path to a directory holding your images/wallpapers
- 5. Done!
+ 1. Install the [linuxwhatelse repository](http://linuxwhatelse.de/projects/kodi/repo/repository.linuxwhatelse.zip)
+ 2. Install PictureIt
+ 3. In the add-on configuration set the path to a directory holding your images/wallpapers
+ 4. Done!
 
 ## ToDo
  * Rework the spectrum.<br>
