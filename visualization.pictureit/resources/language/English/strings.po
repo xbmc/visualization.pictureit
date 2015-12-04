@@ -92,3 +92,11 @@ msgstr ""
 msgctxt "#30018"
 msgid "Use first level of subfolders as presets"
 msgstr ""
+
+msgctxt "#30019"
+msgid "Look & Feel"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Behaviour"
+msgstr ""
