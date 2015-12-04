@@ -57,13 +57,13 @@ void set_effect( const char* efx_name ) {
     int int_val = 0;
 
     if ( strcmp( efx_name, "Crossfade" ) == 0 ) {
-        pictureit->set_img_efx( EFXS::CROSSFADE );
+        pictureit->set_img_transition_efx( EFXS::CROSSFADE );
 
         KODI->GetSetting( "crossfade.fade_ms", &int_val );
         pictureit->EFX->configure("fade_time_ms", int_val);
     }
     else if ( strcmp( efx_name, "Slide" ) == 0 ) {
-        pictureit->set_img_efx( EFXS::SLIDE );
+        pictureit->set_img_transition_efx( EFXS::SLIDE );
 
         KODI->GetSetting( "slide.fade_ms", &int_val );
         pictureit->EFX->configure("slide_time_ms", int_val);
