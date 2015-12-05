@@ -3,6 +3,7 @@
     <!-- Category Background -->
     <category label="30000">
         <setting id="img.directory" label="30001" type="folder" source="local" option="writeable"/>
+        <setting id="img.mode" type="select" label="30021" values="Stretch|Center|Scale|Zoom" default="Zoom" />
         <setting id="img.pick_random" label="30013" type="bool" default="true" />
         <setting id="preset.enabled" label="30018" type="bool" default="true" />
         <setting id="preset.pick_random" label="30017" type="bool" default="true" enable="eq(-1,true)"/>

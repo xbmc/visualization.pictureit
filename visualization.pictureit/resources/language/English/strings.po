@@ -100,3 +100,7 @@ msgstr ""
 msgctxt "#30020"
 msgid "Behaviour"
 msgstr ""
+
+msgctxt "#30021"
+msgid "Mode"
+msgstr ""

@@ -10,9 +10,11 @@ using namespace std;
 
 PictureIt *pictureit = NULL;
 ADDON::CHelper_libXBMC_addon *KODI = NULL;
+VIS_PROPS *vis_props = NULL;
 
-char img_directory[1024]    =   "";
-char img_effect[32]         =   "";
+char img_directory[1024]  =   "";
+char img_mode[32]         =   "";
+char img_effect[32]       =   "";
 
 bool    img_pick_random         = false;
 bool    img_update_by_interval  = false;
@@ -53,7 +55,7 @@ void select_preset( unsigned int index ) {
     }
 }
 
-void set_effect( const char* efx_name ) {
+void set_effect( const char *efx_name ) {
     int int_val = 0;
 
     if ( strcmp( efx_name, "Crossfade" ) == 0 ) {
@@ -68,6 +70,20 @@ void set_effect( const char* efx_name ) {
         KODI->GetSetting( "slide.fade_ms", &int_val );
         pictureit->EFX->configure("slide_time_ms", int_val);
     }
+}
+
+void set_mode( const char *img_mode) {
+    if ( strcmp( img_mode, "Stretch" ) == 0 )
+        pictureit->EFX->image_mode = MODE::STRETCH;
+
+    if ( strcmp( img_mode, "Center" ) == 0 )
+        pictureit->EFX->image_mode = MODE::CENTER;
+
+    else if ( strcmp( img_mode, "Scale" ) == 0 )
+        pictureit->EFX->image_mode = MODE::SCALE;
+
+    else if ( strcmp( img_mode, "Zoom" ) == 0 )
+        pictureit->EFX->image_mode = MODE::ZOOM;
 }
 
 //-- Render -------------------------------------------------------------------
@@ -85,6 +101,8 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
 
+    vis_props = (struct VIS_PROPS *)props;
+
     if ( !KODI )
         KODI = new ADDON::CHelper_libXBMC_addon;
 
@@ -101,6 +119,10 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit = new PictureIt( spectrum_bar_count );
 
     set_effect( img_effect );
+    set_mode( img_mode );
+
+    pictureit->window_width                 = vis_props->width;
+    pictureit->window_height                = vis_props->height;
 
     pictureit->img_pick_random              = img_pick_random;
     pictureit->img_update_by_interval       = img_update_by_interval;
@@ -242,6 +264,7 @@ extern "C" bool IsLocked() {
 //-----------------------------------------------------------------------------
 extern "C" void ADDON_Stop() {
     delete KODI, KODI = NULL;
+    delete vis_props, vis_props = NULL;
     delete pictureit, pictureit = NULL;
 }
 
@@ -296,6 +319,9 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
         if ( ! KODI->CanOpenDirectory(img_directory) )
             return ADDON_STATUS_PERMANENT_FAILURE;
     }
+
+    else if ( strcmp( id, "img.mode") == 0 )
+        strcpy( img_mode, (const char*) value );
 
     else if ( strcmp( id, "img.effect") == 0 )
         strcpy( img_effect, (const char*) value );
