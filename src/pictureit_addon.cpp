@@ -59,31 +59,31 @@ void set_effect( const char *efx_name ) {
     int int_val = 0;
 
     if ( strcmp( efx_name, "Crossfade" ) == 0 ) {
-        pictureit->set_img_transition_efx( EFXS::CROSSFADE );
+        pictureit->set_img_transition_efx( EFX::CROSSFADE );
 
         KODI->GetSetting( "crossfade.fade_ms", &int_val );
-        pictureit->EFX->configure("fade_time_ms", int_val);
+        pictureit->efx->configure("fade_time_ms", int_val);
     }
     else if ( strcmp( efx_name, "Slide" ) == 0 ) {
-        pictureit->set_img_transition_efx( EFXS::SLIDE );
+        pictureit->set_img_transition_efx( EFX::SLIDE );
 
         KODI->GetSetting( "slide.fade_ms", &int_val );
-        pictureit->EFX->configure("slide_time_ms", int_val);
+        pictureit->efx->configure("slide_time_ms", int_val);
     }
 }
 
 void set_mode( const char *img_mode) {
     if ( strcmp( img_mode, "Stretch" ) == 0 )
-        pictureit->EFX->image_mode = MODE::STRETCH;
+        pictureit->efx->image_mode = MODE::STRETCH;
 
     if ( strcmp( img_mode, "Center" ) == 0 )
-        pictureit->EFX->image_mode = MODE::CENTER;
+        pictureit->efx->image_mode = MODE::CENTER;
 
     else if ( strcmp( img_mode, "Scale" ) == 0 )
-        pictureit->EFX->image_mode = MODE::SCALE;
+        pictureit->efx->image_mode = MODE::SCALE;
 
     else if ( strcmp( img_mode, "Zoom" ) == 0 )
-        pictureit->EFX->image_mode = MODE::ZOOM;
+        pictureit->efx->image_mode = MODE::ZOOM;
 }
 
 //-- Render -------------------------------------------------------------------
