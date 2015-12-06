@@ -23,7 +23,8 @@ int     img_update_interval     = 0;
 bool    spectrum_enabled    =   false;
 int     spectrum_bar_count  =   0;
 float   spectrum_width      =   0.0f;
-float   spectrum_position   =   0.0f;
+float   spectrum_position_vertical   =   0.0f;
+float   spectrum_position_horizontal =   0.0f;
 
 bool    spectrum_mirror_vertical    = false;
 bool    spectrum_mirror_horizontal  = false;
@@ -72,7 +73,7 @@ void set_effect( const char *efx_name ) {
     }
 }
 
-void set_mode( const char *img_mode) {
+void set_mode( const char *img_mode ) {
     if ( strcmp( img_mode, "Stretch" ) == 0 )
         pictureit->efx->image_mode = MODE::STRETCH;
 
@@ -129,7 +130,8 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit->img_update_interval          = img_update_interval;
 
     pictureit->spectrum_enabled             = spectrum_enabled;
-    pictureit->spectrum_position            = spectrum_position;
+    pictureit->spectrum_position_vertical   = spectrum_position_vertical;
+    pictureit->spectrum_position_horizontal = spectrum_position_horizontal;
     pictureit->spectrum_width               = spectrum_width;
     pictureit->spectrum_mirror_vertical     = spectrum_mirror_vertical;
     pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
@@ -355,9 +357,12 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
     else if ( strcmp( id, "spectrum.width" ) == 0 )
         spectrum_width = (*(int*) value) * 1.0f / 100;
 
-    else if ( strcmp( id, "spectrum.position" ) == 0 )
-        // We inverse the value just because -1.0 feel more like "bottom" than 1.0
-        spectrum_position = -(*(float*) value);
+    else if ( strcmp( id, "spectrum.position_vertical" ) == 0 )
+        // We inverse the value just because -1.0 feel more like "bottom" than 1.0 does
+        spectrum_position_vertical = -(*(float*) value);
+    
+    else if ( strcmp( id, "spectrum.position_horizontal" ) == 0 )
+        spectrum_position_horizontal = (*(float*) value);
 
     else if ( strcmp( id, "spectrum.mirror_vertical" ) == 0 )
         spectrum_mirror_vertical = *(bool*) value;

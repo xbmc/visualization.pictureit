@@ -74,7 +74,7 @@ msgid "Pick random images"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Position"
+msgid "Position vertical"
 msgstr ""
 
 msgctxt "#30015"
@@ -103,4 +103,8 @@ msgstr ""
 
 msgctxt "#30021"
 msgid "Mode"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Position horizontal"
 msgstr ""

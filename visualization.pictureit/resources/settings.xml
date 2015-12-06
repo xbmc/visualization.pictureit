@@ -28,9 +28,10 @@
         <setting type="lsep" label="30019" />
         <setting id="spectrum.bar_count" label="30008" type="slider" option="int" default="64" range="10,2,100" enable="eq(-2,true)" />
         <setting id="spectrum.width" label="30010" type="slider" option="int" default="85" range="0,100" enable="eq(-3,true)" />
-        <setting id="spectrum.position" label="30014" type="slider" option="float" default="-0.98" range="-1.0,0.02,1.0" enable="eq(-4,true)" />
-        <setting id="spectrum.mirror_vertical" label="30015" type="bool" default="true"  enable="eq(-5,true)" />
-        <setting id="spectrum.mirror_horizontal" label="30016" type="bool" default="false"  enable="eq(-6,true)" />
+        <setting id="spectrum.position_vertical" label="30014" type="slider" option="float" default="-0.98" range="-1.0,0.02,1.0" enable="eq(-4,true)" />
+        <setting id="spectrum.position_horizontal" label="30022" type="slider" option="float" default="0.0" range="-1.0,0.02,1.0" enable="eq(-5,true)" />
+        <setting id="spectrum.mirror_vertical" label="30015" type="bool" default="true"  enable="eq(-6,true)" />
+        <setting id="spectrum.mirror_horizontal" label="30016" type="bool" default="false"  enable="eq(-7,true)" />
 
         <setting type="lsep" label="30020" />
         <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-8,true)" />
