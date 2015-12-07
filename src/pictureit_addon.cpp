@@ -5,6 +5,7 @@
 #include "PictureIt/utils.h"
 
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -57,19 +58,24 @@ void select_preset( unsigned int index ) {
 }
 
 void set_effect( const char *efx_name ) {
-    int int_val = 0;
+    int  int_val = 0;
 
     if ( strcmp( efx_name, "Crossfade" ) == 0 ) {
         pictureit->set_img_transition_efx( EFX::CROSSFADE );
 
         KODI->GetSetting( "crossfade.fade_ms", &int_val );
-        pictureit->efx->configure("fade_time_ms", int_val);
+        pictureit->efx->configure("fade_time_ms", &int_val);
     }
     else if ( strcmp( efx_name, "Slide" ) == 0 ) {
         pictureit->set_img_transition_efx( EFX::SLIDE );
 
         KODI->GetSetting( "slide.fade_ms", &int_val );
-        pictureit->efx->configure("slide_time_ms", int_val);
+        pictureit->efx->configure("slide_time_ms", &int_val);
+
+        KODI->GetSetting( "slide.direction", &int_val );
+        cout<< int_val<< endl;
+        pictureit->efx->configure("slide_direction", &int_val);
+        
     }
 }
 

@@ -18,7 +18,8 @@
             <!-- Crossfade config -->
                 <setting id="crossfade.fade_ms" label="30002" type="slider" option="int" default="1000" range="250,250,5000" visible="eq(-1,Crossfade)" />            
             <!-- Slide config -->
-                <setting id="slide.fade_ms" label="30002" type="slider" option="int" default="2500" range="250,250,5000" visible="eq(-2,Slide)" />            
+                <setting id="slide.fade_ms" label="30002" type="slider" option="int" default="2500" range="250,250,5000" visible="eq(-2,Slide)" />
+                <setting id="slide.direction" type="enum" label="30023" lvalues="30024|30025|30026|30027|30028" default="0" visible="eq(-3,Slide)"/>
     </category>
     
     <!-- Category Spectrum -->
@@ -34,7 +35,7 @@
         <setting id="spectrum.mirror_horizontal" label="30016" type="bool" default="false"  enable="eq(-7,true)" />
 
         <setting type="lsep" label="30020" />
-        <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-8,true)" />
+        <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-9,true)" />
     </category>
 
 </settings>

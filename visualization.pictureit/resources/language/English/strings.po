@@ -108,3 +108,28 @@ msgstr ""
 msgctxt "#30022"
 msgid "Position horizontal"
 msgstr ""
+
+msgctxt "#30023"
+msgid "Direction"
+msgstr ""
+
+
+msgctxt "#30024"
+msgid "Left to Right"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Right to Left"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Top to Bottom"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Bottom to Top"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Random"
+msgstr ""
