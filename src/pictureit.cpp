@@ -28,7 +28,7 @@ GLuint                 img_tex_ids[3]          =    {};
 
 bool                   update_img              =    false;               // When set to "true", a new image will be crossfaded
 
-const char*            presets_root_dir        =    "";                  // Root directory holding subfolders that will be used
+char                   presets_root_dir[1024]  =   "";                   // Root directory holding subfolders that will be used
                                                                          // as presets and searched for images
 unsigned int           presets_count           =    0;                   // Amount of presets (subfolders) found
 unsigned int           preset_index            =    0;                   // Index of the currently selected preset
@@ -85,7 +85,7 @@ static long int get_current_time_ms() {
 }
 
 // Join file/folder path
-const char* path_join(std::string a, std::string b) {
+std::string path_join(std::string a, std::string b) {
     // Apparently Windows does understand a "/" just fine...
     // Haven't tested it though, but for now I'm just believing it
 
@@ -101,7 +101,7 @@ const char* path_join(std::string a, std::string b) {
     if ( b.substr( b.length() - 1, b.length() ) == "/" )
         b = b.substr( 0, b.size() -1 );
 
-    return ( a + "/" + b ).c_str();
+    return a + "/" + b;
 }
 
 // List the contents of a directory (excluding "." files/folders)
@@ -124,7 +124,7 @@ int list_dir(const char *path, td_vec_str &store, bool recursive = false, bool i
                 add = true;
 
             if ( recursive )
-                return list_dir( path_join( p, name), store, recursive, incl_full_path, filter_size, file_filter );
+                return list_dir( path_join( p, name).c_str(), store, recursive, incl_full_path, filter_size, file_filter );
         } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
             if ( file_filter ) {
                 for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
@@ -138,7 +138,7 @@ int list_dir(const char *path, td_vec_str &store, bool recursive = false, bool i
 
         if ( add ) {
             if ( incl_full_path )
-                store.push_back( path_join( p, name ) );
+                store.push_back( path_join( p, name ).c_str() );
             else
                 store.push_back( name );
             add = false;
@@ -170,7 +170,7 @@ void load_data( const char* path ) {
 
     if ( ! pi_presets.empty() ) {
         for ( unsigned int i = 0; i < pi_presets.size(); i++ ) {
-            list_dir( path_join( path, pi_presets[i] ), images, true, true, sizeof(img_filter), img_filter );
+            list_dir( path_join( path, pi_presets[i] ).c_str(), images, true, true, sizeof(img_filter), img_filter );
 
             // Preset empty or can't be accessed
             if ( images.size() <= 0 ) {
@@ -666,7 +666,7 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
         const char* dir = (const char*) value;
         if ( dir && !dir[0] )
             return ADDON_STATUS_NEED_SETTINGS;
-        presets_root_dir = dir;
+        strcpy( presets_root_dir, (const char*) value );
     }
 
     if ( str == "update_on_new_track" )
