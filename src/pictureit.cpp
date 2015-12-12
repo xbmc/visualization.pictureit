@@ -124,7 +124,7 @@ int list_dir(const char *path, td_vec_str &store, bool recursive = false, bool i
                 add = true;
 
             if ( recursive )
-                return list_dir( path_join( p, name).c_str(), store, recursive, incl_full_path, filter_size, file_filter );
+                list_dir( path_join( p, name).c_str(), store, recursive, incl_full_path, filter_size, file_filter );
         } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
             if ( file_filter ) {
                 for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
