@@ -1,1 +1,1 @@
-PictureIt file:///home/tadly/Development/workspaces/c++/PictureIt
+PictureIt https://github.com/linuxwhatelse/PictureIt master
