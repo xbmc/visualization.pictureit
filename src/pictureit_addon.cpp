@@ -51,7 +51,7 @@ void load_presets() {
 void select_preset( unsigned int index ) {
     if ( index < PRESETS.size() ) {
         preset_index = index;
-        pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]));
+        pictureit->load_images(PI_UTILS::path_join(img_directory, PRESETS[preset_index]).c_str());
         pictureit->update_image();
     }
 }
