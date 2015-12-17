@@ -133,3 +133,11 @@ msgstr ""
 msgctxt "#30028"
 msgid "Random"
 msgstr ""
+
+msgctxt "#30029"
+msgid "Flip vertical"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Flip horizontal"
+msgstr ""

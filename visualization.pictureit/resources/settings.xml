@@ -33,6 +33,8 @@
         <setting id="spectrum.position_horizontal" label="30022" type="slider" option="float" default="0.0" range="-1.0,0.01,1.0" enable="eq(-5,true)" />
         <setting id="spectrum.mirror_vertical" label="30015" type="bool" default="true"  enable="eq(-6,true)" />
         <setting id="spectrum.mirror_horizontal" label="30016" type="bool" default="false"  enable="eq(-7,true)" />
+        <setting id="spectrum.flip_vertical" label="30029" type="bool" default="false"  enable="eq(-8,true)" />
+        <setting id="spectrum.flip_horizontal" label="30030" type="bool" default="false"  enable="eq(-9,true)" />
 
         <setting type="lsep" label="30020" />
         <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-9,true)" />

@@ -28,6 +28,8 @@ float   spectrum_position_horizontal =   0.0f;
 
 bool    spectrum_mirror_vertical    = false;
 bool    spectrum_mirror_horizontal  = false;
+bool    spectrum_flip_vertical      = false;
+bool    spectrum_flip_horizontal    = false;
 float   spectrum_animation_speed    = 0.0f;
 
 
@@ -139,6 +141,8 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
     pictureit->spectrum_width               = spectrum_width;
     pictureit->spectrum_mirror_vertical     = spectrum_mirror_vertical;
     pictureit->spectrum_mirror_horizontal   = spectrum_mirror_horizontal;
+    pictureit->spectrum_flip_vertical       = spectrum_flip_vertical;
+    pictureit->spectrum_flip_horizontal     = spectrum_flip_horizontal;
     pictureit->spectrum_animation_speed     = spectrum_animation_speed;
 
     if ( preset_enabled )
@@ -373,6 +377,12 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
 
     else if ( strcmp( id, "spectrum.mirror_horizontal" ) == 0 )
         spectrum_mirror_horizontal = *(bool*) value;
+
+    else if ( strcmp( id, "spectrum.flip_vertical" ) == 0 )
+        spectrum_flip_vertical = *(bool*) value;
+
+    else if ( strcmp( id, "spectrum.flip_horizontal" ) == 0 )
+        spectrum_flip_horizontal = *(bool*) value;
 
     else if ( strcmp( id, "spectrum.animation_speed" ) == 0 )
         spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
