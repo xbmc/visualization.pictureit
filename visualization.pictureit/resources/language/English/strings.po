@@ -141,3 +141,7 @@ msgstr ""
 msgctxt "#30030"
 msgid "Flip horizontal"
 msgstr ""
+
+msgctxt "#30031"
+msgid "Only update by interval if no duration exists (e.g. live-streams)"
+msgstr ""

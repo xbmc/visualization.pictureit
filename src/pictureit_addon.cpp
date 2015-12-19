@@ -12,12 +12,15 @@ PictureIt *pictureit = NULL;
 ADDON::CHelper_libXBMC_addon *KODI = NULL;
 VIS_PROPS *vis_props = NULL;
 
+int track_duration = 0;
+
 char img_directory[1024]  =   "";
 char img_mode[32]         =   "";
 char img_effect[32]       =   "";
 
 bool    img_pick_random         = false;
 bool    img_update_by_interval  = false;
+bool    img_update_by_interval_if_no_duration = false;
 int     img_update_interval     = 0;
 
 bool    spectrum_enabled    =   false;
@@ -227,6 +230,11 @@ extern "C" bool OnAction(long flags, const void *param) {
         case VIS_ACTION_UPDATE_TRACK:
             if ( img_update_by_track )
                 pictureit->update_image();
+
+            if ( ( (VisTrack*)param )->duration == 0 )
+                pictureit->img_update_by_interval = true;
+            else
+                pictureit->img_update_by_interval = false;
             break;
         default:
             ret = false;
@@ -350,6 +358,9 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
 
     else if ( strcmp( id, "img.update_by_interval" ) == 0 )
         img_update_by_interval = *(bool*) value;
+
+    else if ( strcmp( id, "img.update_by_interval_if_no_duration" ) == 0 )
+        img_update_by_interval_if_no_duration = *(bool*) value;
 
     else if ( strcmp( id, "img.update_interval" ) == 0 )
         img_update_interval = *(int*) value;

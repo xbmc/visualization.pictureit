@@ -10,7 +10,8 @@
 
         <setting id="img.update_by_track" label="30003" type="bool" default="true" />
         <setting id="img.update_by_interval" label="30004" type="bool" default="true" />
-        <setting id="img.update_interval" label="30005" type="slider" option="int" default="300" range="5,5,600" enable="eq(-1,true)" />
+        <setting id="img.update_by_interval_if_no_duration" label="30031" type="bool" default="true" enable="eq(-1,true)" />
+        <setting id="img.update_interval" label="30005" type="slider" option="int" default="300" range="5,5,600" enable="eq(-2,true)" />
 
         <!-- Subcategory Effect -->
         <setting type="lsep" label="30011" />
