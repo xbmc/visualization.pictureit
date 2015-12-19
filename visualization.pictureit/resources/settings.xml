@@ -38,7 +38,7 @@
         <setting id="spectrum.flip_horizontal" label="30030" type="bool" default="false"  enable="eq(-9,true)" />
 
         <setting type="lsep" label="30020" />
-        <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-9,true)" />
+        <setting id="spectrum.animation_speed" label="30009" type="slider" option="int" default="70" range="50,100" enable="eq(-11,true)" />
     </category>
 
 </settings>
