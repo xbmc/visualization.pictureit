@@ -1,28 +1,18 @@
 cmake_minimum_required(VERSION 2.6)
-project(visualization.pictureit)
-
-enable_language(CXX)
+project(visualization.pictureit CXX)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-list(APPEND CMAKE_PREFIX_PATH ${PROJECT_BINARY_DIR}/depends/common)
 
-# Find and include KODI
+# Find and include kodi
 find_package(kodi REQUIRED)
 include_directories(${KODI_INCLUDE_DIR})
 
-
 # Find and include PictureIt
 find_package(PictureIt REQUIRED)
-include_directories(${PICTUREIT_INCLUDE_DIR})
-list(APPEND DEPLIBS "${PICTUREIT_LIBRARY}")
+include_directories(${PICTUREIT_INCLUDE_DIR} ${PICTUREIT_INCLUDE_DIRS})
+list(APPEND DEPLIBS ${PICTUREIT_LIBRARY} ${PICTUREIT_LIBRARIES})
 
-
-set(ADDON_SOURCES ${PROJECT_SOURCE_DIR}/src/pictureit_addon.cpp)
-
-
-if(APPLE)
-    list(APPEND DEPLIBS "-framework CoreVideo")
-endif(APPLE)
+set(ADDON_SOURCES src/pictureit_addon.cpp)
 
 build_addon(visualization.pictureit ADDON DEPLIBS)
 
