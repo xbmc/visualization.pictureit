@@ -48,6 +48,8 @@ bool            preset_locked   =    false;
 vector<string> PRESETS; // Holds all preset-names in alphabetical order
 
 void load_presets() {
+    PRESETS.clear();
+
     PI_UTILS::list_dir( img_directory, PRESETS, false, false, NULL, 0 );
     sort( PRESETS.begin(), PRESETS.end() );
 }
@@ -78,7 +80,7 @@ void set_effect( const char *efx_name ) {
 
         if ( KODI->GetSetting( "slide.direction", &int_val ) );
             pictureit->efx->configure("slide_direction", &int_val);
-        
+
     }
 }
 
@@ -379,7 +381,7 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
     else if ( strcmp( id, "spectrum.position_vertical" ) == 0 )
         // We inverse the value just because -1.0 feel more like "bottom" than 1.0 does
         spectrum_position_vertical = -(*(float*) value);
-    
+
     else if ( strcmp( id, "spectrum.position_horizontal" ) == 0 )
         spectrum_position_horizontal = (*(float*) value);
 
