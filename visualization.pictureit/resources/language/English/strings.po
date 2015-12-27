@@ -145,3 +145,91 @@ msgstr ""
 msgctxt "#30031"
 msgid "Only update by interval if no duration exists (e.g. live-streams)"
 msgstr ""
+
+msgctxt "#30032"
+msgid "Color"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Red"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Pink"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Purple"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Deep Purple"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Indigo"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Blue"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Light Blue"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Cyan"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Teal"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Green"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Light Green"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Lime"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Yellow"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Amber"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Orange"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Deep Orange"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Brown"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Gray"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Blue Gray"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Black"
+msgstr ""
+
+msgctxt "#30053"
+msgid "White"
+msgstr ""

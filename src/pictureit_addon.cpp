@@ -1,5 +1,5 @@
-#include <xbmc_vis_dll.h>
-#include <libXBMC_addon.h>
+#include <kodi/xbmc_vis_dll.h>
+#include <kodi/libXBMC_addon.h>
 
 #include "PictureIt/pictureit.h"
 #include "PictureIt/utils.h"
@@ -34,7 +34,7 @@ bool    spectrum_mirror_horizontal  = false;
 bool    spectrum_flip_vertical      = false;
 bool    spectrum_flip_horizontal    = false;
 float   spectrum_animation_speed    = 0.0f;
-
+int     spectrum_color              = 0;
 
 bool    preset_enabled      =   false;
 bool    preset_pick_random  =   false;
@@ -98,6 +98,122 @@ void set_mode( const char *img_mode ) {
         pictureit->efx->image_mode = MODE::ZOOM;
 }
 
+void set_spectrum_color( int pos ) {
+    float r, g, b;
+    switch ( pos ) {
+        case 0:  // Red
+            r = 244 / 255.0f;
+            g = 67 / 255.0f;
+            b = 54 / 255.0f;
+            break;
+        case 1:  // Pink
+            r = 233 / 255.0f;
+            g = 30 / 255.0f;
+            b = 99 / 255.0f;
+            break;
+        case 2:  // Purple
+            r = 156 / 255.0f;
+            g = 39 / 255.0f;
+            b = 176 / 255.0f;
+            break;
+        case 3:  // Deep Purple
+            r = 103 / 255.0f;
+            g = 58 / 255.0f;
+            b = 183 / 255.0f;
+            break;
+        case 4:  // Indigo
+            r = 63 / 255.0f;
+            g = 81 / 255.0f;
+            b = 181 / 255.0f;
+            break;
+        case 5:  // Blue
+            r = 33 / 255.0f;
+            g = 150 / 255.0f;
+            b = 243 / 255.0f;
+            break;
+        case 6:  // Light Blue
+            r = 3 / 255.0f;
+            g = 169 / 255.0f;
+            b = 244 / 255.0f;
+            break;
+        case 7:  // Cyan
+            r = 0 / 255.0f;
+            g = 188 / 255.0f;
+            b = 212 / 255.0f;
+            break;
+        case 8:  // Teal
+            r = 0 / 255.0f;
+            g = 150 / 255.0f;
+            b = 136 / 255.0f;
+            break;
+        case 9:  // Green
+            r = 76 / 255.0f;
+            g = 175 / 255.0f;
+            b = 80 / 255.0f;
+            break;
+        case 10:  // Light Green
+            r = 139 / 255.0f;
+            g = 195 / 255.0f;
+            b = 74 / 255.0f;
+            break;
+        case 11:  // Lime
+            r = 205 / 255.0f;
+            g = 220 / 255.0f;
+            b = 57 / 255.0f;
+            break;
+        case 12:  // Yellow
+            r = 255 / 255.0f;
+            g = 235 / 255.0f;
+            b = 59 / 255.0f;
+            break;
+        case 13:  // Amber
+            r = 255 / 255.0f;
+            g = 193 / 255.0f;
+            b = 7 / 255.0f;
+            break;
+        case 14:  // Orange
+            r = 255 / 255.0f;
+            g = 152 / 255.0f;
+            b = 0 / 255.0f;
+            break;
+        case 15:  // Deep Orange
+            r = 255 / 255.0f;
+            g = 87 / 255.0f;
+            b = 34 / 255.0f;
+            break;
+        case 16:  // Brown
+            r = 121 / 255.0f;
+            g = 85 / 255.0f;
+            b = 72 / 255.0f;
+            break;
+        case 17:  // Gray
+            r = 158 / 255.0f;
+            g = 158 / 255.0f;
+            b = 158 / 255.0f;
+            break;
+        case 18:  // Blue Gray
+            r = 96 / 255.0f;
+            g = 125 / 255.0f;
+            b = 139 / 255.0f;
+            break;
+        case 19:  // Black
+            r = 0 / 255.0f;
+            g = 0 / 255.0f;
+            b = 0 / 255.0f;
+            break;
+        default:
+        case 20:  // White
+            r = 255 / 255.0f;
+            g = 255 / 255.0f;
+            b = 255 / 255.0f;
+            break;
+    }
+
+    for ( int i = 0; i < spectrum_bar_count; i++ ) {
+        pictureit->set_bar_color( i, r, g, b );
+    }
+}
+
 //-- Render -------------------------------------------------------------------
 // Called once per frame. Do all rendering here.
 //-----------------------------------------------------------------------------
@@ -119,7 +235,7 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
         KODI = new ADDON::CHelper_libXBMC_addon;
 
     if ( !KODI->RegisterMe(hdl) ) {
-        delete KODI, KODI=NULL;
+        delete KODI, KODI = NULL;
 
         return ADDON_STATUS_PERMANENT_FAILURE;
     }
@@ -132,6 +248,7 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
 
     set_effect( img_effect );
     set_mode( img_mode );
+    set_spectrum_color( spectrum_color );
 
     pictureit->window_width                 = vis_props->width;
     pictureit->window_height                = vis_props->height;
@@ -399,6 +516,9 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *id, const void *value ) {
 
     else if ( strcmp( id, "spectrum.animation_speed" ) == 0 )
         spectrum_animation_speed = (*(int*) value) * 0.005f / 100;
+
+    else if ( strcmp( id, "spectrum.color" ) == 0 )
+        spectrum_color = atoi((const char*) value);
 
     return ADDON_STATUS_OK;
 }
