@@ -1,1 +1,1 @@
-asplib https://github.com/Tadly/asplib PREVIEW__add-spectrum-vis-processor
+asplib https://github.com/Tadly/asplib add-spectrum-vis-processor
