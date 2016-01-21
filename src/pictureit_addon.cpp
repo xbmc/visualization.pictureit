@@ -1,5 +1,5 @@
-#include <kodi/xbmc_vis_dll.h>
-#include <kodi/libXBMC_addon.h>
+#include "xbmc_vis_dll.h"
+#include "libXBMC_addon.h"
 
 #include <PictureIt/pictureit.h>
 #include <PictureIt/utils.h>

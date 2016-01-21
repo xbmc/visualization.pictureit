@@ -1,6 +1,8 @@
 PictureIt - Kodi Visualization
 ==============================
 
+[![Linux Build Status](https://travis-ci.org/linuxwhatelse/visualization.pictureit.svg?branch=dev)](https://travis-ci.org/linuxwhatelse/visualization.pictureit)
+
 PictureIt is supposed to make listening to music more elegant and less flashy.<br>
 The idea is to take random images YOU selected and display them alongside a simple spectrum at the bottom.<br>
 Simple right?
