@@ -476,6 +476,13 @@ extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *
     if ( ! vis_enabled )
         return;
 
+    // With jarvis, while the next track starts, iAudioDataLength can be a ridicules value
+    // which ultimately crashes kodi.
+    // For the sake of fixing it somehow we, we set it to vis_bar_count * 2 as that's all we
+    // need anyway
+    if ( iAudioDataLength > vis_bar_count * 2 )
+        iAudioDataLength = vis_bar_count * 2;
+
     iFreqDataLength = iAudioDataLength/2;
     float freq_data[iFreqDataLength];
 
