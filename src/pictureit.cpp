@@ -77,6 +77,7 @@ td_vec_str      pi_presets;     // Holds all preset-names in alphabetical order
 td_vec_str      pi_images;      // Always holds the images for the currently selected preset and will be updated upon preset change
 td_map_data     pi_data;        // Map consisting of key = preset-name, value = vector of all associated images
 
+int                     prev_freq_data_length =    0;
 
 static const char *img_filter[] = { "*.jpg", "*.png", "*.jpeg" };
 
@@ -447,7 +448,7 @@ extern "C" void Render() {
 ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
     if ( ! props )
         return ADDON_STATUS_UNKNOWN;
-    
+
     // Seed the psuedo-random number generator
     std::srand( time(0) );
 
@@ -471,19 +472,15 @@ extern "C" void Start(int iChannels, int iSamplesPerSec, int iBitsPerSample, con
 // is in place
 #include "mrfft.h"
 #include <memory>
+
 std::unique_ptr<MRFFT> m_transform;
 extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *pFreqData, int iFreqDataLength) {
     if ( ! vis_enabled )
         return;
 
-    // With jarvis, while the next track starts, iAudioDataLength can be a ridicules value
-    // which ultimately crashes kodi.
-    // For the sake of fixing it somehow we, we set it to vis_bar_count * 2 as that's all we
-    // need anyway
-    if ( iAudioDataLength > vis_bar_count * 2 )
-        iAudioDataLength = vis_bar_count * 2;
+    iFreqDataLength = iAudioDataLength / 2;
+    iFreqDataLength -= iFreqDataLength % 2;
 
-    iFreqDataLength = iAudioDataLength/2;
     float freq_data[iFreqDataLength];
 
     // This part is essentially the same as what Kodi would do if we'd set "pInfo->bWantsFreq = true" (in the GetInfo methode)
@@ -491,8 +488,10 @@ extern "C" void AudioData(const float* pAudioData, int iAudioDataLength, float *
     // So I just copied the "rfft.h" and "rfft.cpp", renamed the classe to "MRFFT" (otherwise we'd use the original) and set
     // the flag to "true".
     // Further this gives us the ability to change the response if needed (They return the magnitude per default I believe)
-    if ( ! m_transform )
+    if ( prev_freq_data_length != iFreqDataLength || ! m_transform ) {
         m_transform.reset(new MRFFT(iFreqDataLength, true));
+        prev_freq_data_length = iFreqDataLength;
+    }
 
     m_transform->calc(pAudioData, freq_data);
 
