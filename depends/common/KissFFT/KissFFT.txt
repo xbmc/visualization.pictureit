@@ -1,1 +1,1 @@
-KissFFT https://github.com/Tadly/KissFFT master
+KissFFT http://gitub.com/AchimTuran/KissFFT V1.30

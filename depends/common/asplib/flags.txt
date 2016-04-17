@@ -1,0 +1,1 @@
+-DASPLIB_MODULES_TO_BUILD=SpectrumVisProcessor
