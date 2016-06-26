@@ -8,9 +8,9 @@
 
 using namespace std;
 
-PictureIt *pictureit = NULL;
-ADDON::CHelper_libXBMC_addon *KODI = NULL;
-VIS_PROPS *vis_props = NULL;
+PictureIt *pictureit = nullptr;
+ADDON::CHelper_libXBMC_addon *KODI = nullptr;
+VIS_PROPS *vis_props = nullptr;
 
 int track_duration = 0;
 
@@ -50,7 +50,7 @@ vector<string> PRESETS; // Holds all preset-names in alphabetical order
 void load_presets() {
     PRESETS.clear();
 
-    PI_UTILS::list_dir( img_directory, PRESETS, false, false, NULL, 0 );
+    PI_UTILS::list_dir( img_directory, PRESETS, false, false, nullptr, 0 );
     sort( PRESETS.begin(), PRESETS.end() );
 }
 
@@ -101,6 +101,7 @@ void set_mode( const char *img_mode ) {
 void set_spectrum_color( int pos ) {
     float r, g, b;
     switch ( pos ) {
+        // TODO Tadly: it would be nice if you use enums here.
         case 0:  // Red
             r = 244 / 255.0f;
             g = 67 / 255.0f;
@@ -231,11 +232,9 @@ ADDON_STATUS ADDON_Create( void* hdl, void* props ) {
 
     vis_props = (struct VIS_PROPS *)props;
 
-    if ( !KODI )
-        KODI = new ADDON::CHelper_libXBMC_addon;
-
+    KODI = new ADDON::CHelper_libXBMC_addon;
     if ( !KODI->RegisterMe(hdl) ) {
-        delete KODI, KODI = NULL;
+        delete KODI, KODI = nullptr;
 
         return ADDON_STATUS_PERMANENT_FAILURE;
     }
@@ -400,9 +399,9 @@ extern "C" bool IsLocked() {
 // !!! Add-on master function !!!
 //-----------------------------------------------------------------------------
 extern "C" void ADDON_Stop() {
-    delete KODI, KODI = NULL;
-    delete vis_props, vis_props = NULL;
-    delete pictureit, pictureit = NULL;
+    delete KODI, KODI = nullptr;
+    delete vis_props, vis_props = nullptr;
+    delete pictureit, pictureit = nullptr;
 }
 
 //-- Destroy ------------------------------------------------------------------
