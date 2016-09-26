@@ -13,7 +13,11 @@
 #include <dirent.h>
 #include <fnmatch.h>
 
-#include <GL/gl.h>
+#if defined(HAS_GL)
+  #include <GL/gl.h>
+#elif defined(HAS_GLES)
+  #include <GLES/gl.h>
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_JPEG
@@ -230,12 +234,17 @@ GLuint load_image( GLuint img_tex_id = 0 ) {
     glGenTextures(1, texture);
 
     glBindTexture(GL_TEXTURE_2D, texture[0]);
+#if defined(HAS_GL)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+#elif defined(HAS_GLES)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+#endif
 
     stbi_image_free(data);
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,      GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,      GL_CLAMP_TO_EDGE );
 
@@ -261,13 +270,37 @@ void draw_image( GLuint img_tex_id, float opacity ) {
     else
         glColor4f( 1.0f, 1.0f, 1.0f, opacity );
 
+#if defined(HAS_GL)
     glBegin( GL_QUADS );
         glTexCoord2f( 0.0f, 0.0f ); glVertex2f( -1.0f, -1.0f );  // Top Left
         glTexCoord2f( 1.0f, 0.0f ); glVertex2f(  1.0f, -1.0f );  // Top Right
         glTexCoord2f( 1.0f, 1.0f ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
         glTexCoord2f( 0.0f, 1.0f ); glVertex2f( -1.0f,  1.0f );  // Bottom Left
     glEnd();
+#elif defined(HAS_GLES)
+    GLfloat vtx1[] = {
+        -1,-1,
+         1,-1,
+         1, 1,
+        -1, 1
+    };
+    GLfloat tex1[] = {
+        0,0,
+        1,0,
+        1,1,
+        0,1
+    };
 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glVertexPointer(2, GL_FLOAT, 0, vtx1);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex1);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#endif
     glDisable( GL_TEXTURE_2D );
     glDisable( GL_BLEND );
 }
@@ -292,6 +325,7 @@ void draw_bars( int i, GLfloat x1, GLfloat x2 ) {
     pvis_bar_heights[i] = vis_bar_heights[i];
     GLfloat y2 = vis_bottom_edge - cvis_bar_heights[i];
 
+#if defined(HAS_GL)
     glBegin(GL_QUADS);
         glVertex2f( x1, y2 );               // Top Left
         glVertex2f( x2, y2 );               // Top Right
@@ -306,13 +340,39 @@ void draw_bars( int i, GLfloat x1, GLfloat x2 ) {
         glVertex2f( -x1, vis_bottom_edge );  // Bottom Right
         glVertex2f( -x2, vis_bottom_edge );  // Bottom Left
     glEnd();
+#elif defined(HAS_GLES)
+    GLfloat q4[] = {
+        x1,y2,
+        x2,y2,
+        x2,vis_bottom_edge,
+        x1,vis_bottom_edge
+    };
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, q4);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    GLfloat q5[] = {
+        -x2,y2,
+        -x1,y2,
+        -x1,vis_bottom_edge,
+        -x2,vis_bottom_edge
+    };
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, q5);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }
 
 // Some initial OpenGL stuff
 void start_render() {
+#if defined(HAS_GL)
     // save OpenGL original state
     glPushAttrib( GL_ENABLE_BIT | GL_TEXTURE_BIT );
-
+#endif
     // Clear The Screen And The Depth Buffer
     glClear( GL_COLOR_BUFFER_BIT );
 
@@ -325,8 +385,11 @@ void start_render() {
     //     screen top left:     ( -1, -1 )
     //     screen center:       (  0,  0 )
     //     screen bottom right: (  1,  1 )
+#if defined(HAS_GL)
     glOrtho( -1, 1, 1, -1, -1, 1 );
-
+#elif defined(HAS_GLES)
+    glOrthof( -1, 1, 1, -1, -1, 1 );
+#endif
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
@@ -338,9 +401,10 @@ void finish_render() {
     glPopMatrix();
     glMatrixMode( GL_PROJECTION );
     glPopMatrix();
-
+#if defined(HAS_GL)
     // restore OpenGl original state
     glPopAttrib();
+#endif
 }
 
 //-- Render -------------------------------------------------------------------
@@ -405,12 +469,26 @@ extern "C" void Render() {
             glPushMatrix();
                 glEnable( GL_BLEND );
                 glColor4f( 0.0f, 0.0f, 0.0f, 0.7f );
+#if defined(HAS_GL)
                 glBegin( GL_QUADS );
                     glVertex2f(  1.0f, ( vis_bottom_edge - vis_bar_max_height ) - ( 1.0f - vis_bottom_edge ) );
                     glVertex2f( -1.0f, ( vis_bottom_edge - vis_bar_max_height ) - ( 1.0f - vis_bottom_edge ) );
                     glVertex2f( -1.0f, 1.0f );
                     glVertex2f(  1.0f, 1.0f );
                 glEnd();
+#elif defined(HAS_GLES)
+                GLfloat q6[] = {
+                    1, ( vis_bottom_edge - vis_bar_max_height ) - ( 1.0f - vis_bottom_edge ),
+                   -1, ( vis_bottom_edge - vis_bar_max_height ) - ( 1.0f - vis_bottom_edge ),
+                   -1, 1,
+                   1, 1
+                };
+
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glVertexPointer(2, GL_FLOAT, 0, q6);
+                glDrawArrays(GL_TRIANGLE_FAN,0,4);
+                glDisableClientState(GL_VERTEX_ARRAY);
+#endif
                 glDisable( GL_BLEND );
             glPopMatrix();
         }
@@ -420,8 +498,11 @@ extern "C" void Render() {
         // This needs to be done to ensure the exact same height-value for both
         // the left and the (mirrored) right bar
         glPushMatrix();
+#if defined(HAS_GL)
             glColor3f( 1.0f, 1.0f, 1.0f );
-
+#elif defined(HAS_GLES)
+            glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+#endif
             GLfloat x1, x2;
             float bar_width = vis_width / vis_bar_count;
             for ( int i = 1; i <= vis_bar_count; i++ ) {
