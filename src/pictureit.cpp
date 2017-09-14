@@ -220,6 +220,9 @@ GLuint load_image( GLuint img_tex_id = 0 ) {
     if ( pi_images.empty() )
         return 0;
 
+    if( img_tex_id )
+	    glDeleteTextures(1, &img_tex_id);
+
     int x, y, n;
     unsigned char *data = stbi_load(pi_images[get_next_img_pos()].c_str(), &x, &y, &n, 0);
 
@@ -628,7 +631,9 @@ extern "C" void ADDON_Stop() {}
 // Do everything before unload of this add-on
 // !!! Add-on master function !!!
 //-----------------------------------------------------------------------------
-extern "C" void ADDON_Destroy() {}
+extern "C" void ADDON_Destroy() {
+    glDeleteTextures(3, img_tex_ids);
+}
 
 //-- HasSettings --------------------------------------------------------------
 // Returns true if this add-on use settings
