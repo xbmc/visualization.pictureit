@@ -6,8 +6,9 @@
 	    <setting    id="update_on_new_track"    label="30003"   type="bool"     default="true"  />
 	    <setting    id="update_by_interval"     label="30004"   type="bool"     default="true"  />
 	    <setting    id="img_update_interval"    label="30005"   type="slider"   option="int"    default="10"     range="5,5,600" enable="eq(-1,true)"  />
+	    <setting    id="max_fps"                label="30012"   type="slider"   option="int"    default="60"     range="30,5,120" />
     </category>
-    
+
     <category label="30006">
         <setting    id="vis_enabled"            label="30007"   type="bool"     default="true"  />
         <setting    id="vis_bg_enabled"         label="30008"   type="bool"     default="true"  enable="eq(-1,true)"   />

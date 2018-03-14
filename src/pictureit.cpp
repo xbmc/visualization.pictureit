@@ -4,7 +4,9 @@
 #include <sys/time.h>
 
 #include <math.h>
+#include <chrono>
 #include <algorithm>
+#include <thread>
 
 #include <string>
 #include <vector>
@@ -44,6 +46,8 @@ bool                   update_on_new_track     =    true;                // If w
 static int             img_update_interval     =    180;                 // How often the images will get updated (in sec.) (Kodi setting)
 int                    img_current_pos         =    0;
 time_t                 img_last_updated        =    time(0);             // Time (in sec.) where we last updated the image
+
+int                    max_fps                 =    60;                  // Max fps while rendering.
 
 GLfloat                fade_last               =    0.0f;                // The last alpha value of our image
 GLfloat                fade_current            =    0.0f;                // The current alpha value of our image
@@ -350,6 +354,9 @@ void finish_render() {
 // Called once per frame. Do all rendering here.
 //-----------------------------------------------------------------------------
 extern "C" void Render() {
+    std::chrono::time_point<std::chrono::steady_clock> t_fps = (
+        std::chrono::steady_clock::now() +
+            std::chrono::microseconds(1000000 / max_fps - 100));
     start_render();
 
     // reached next update-intervall
@@ -443,6 +450,7 @@ extern "C" void Render() {
     }
 
     finish_render();
+    std::this_thread::sleep_until(t_fps);
 }
 
 //-- Create -------------------------------------------------------------------
@@ -691,6 +699,9 @@ extern "C" ADDON_STATUS ADDON_SetSetting( const char *strSetting, const void* va
 
     if ( str == "img_update_interval" )
         img_update_interval = *(int*) value;
+
+    if ( str == "max_fps" )
+        max_fps = *(int*) value;
 
     if ( str == "fade_time_ms" )
         fade_time_ms = *(int*) value;
