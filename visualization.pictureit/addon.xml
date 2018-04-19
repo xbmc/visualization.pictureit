@@ -14,8 +14,8 @@
         <platform>linux</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
         <forum>http://forum.kodi.tv/showthread.php?tid=236514</forum>
-        <website>http://www.linuxwhatelse.com</website>
-        <email>info@linuxwhatelse.com</email>
+        <website>http://www.linuxwhatelse.de</website>
+        <email>info@linuxwhatelse.de</email>
         <source>https://github.com/linuxwhatelse/visualization.pictureit</source>
     </extension>
 
