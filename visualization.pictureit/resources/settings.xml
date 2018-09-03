@@ -2,11 +2,10 @@
 <settings>
     <category label="30000">
 	    <setting    id="presets_root_dir"       label="30001"   type="folder"   source="auto"   option="writeable"/>
-        <setting    id="fade_time_ms"           label="30002"   type="slider"   option="int"    default="2"     range="250,250,5000" />
+        <setting    id="fade_time_ms"           label="30002"   type="slider"   option="int"    default="250"    range="250,250,5000" />
 	    <setting    id="update_on_new_track"    label="30003"   type="bool"     default="true"  />
 	    <setting    id="update_by_interval"     label="30004"   type="bool"     default="true"  />
 	    <setting    id="img_update_interval"    label="30005"   type="slider"   option="int"    default="10"     range="5,5,600" enable="eq(-1,true)"  />
-	    <setting    id="max_fps"                label="30012"   type="slider"   option="int"    default="60"     range="30,5,120" />
     </category>
 
     <category label="30006">

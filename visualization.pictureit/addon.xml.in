@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+    id="visualization.pictureit"
+    version="2.0.0"
+    name="PictureIt"
+    provider-name="linuxwhatelse">
+    <requires>@ADDON_DEPENDS@</requires>
+    <extension
+        point="xbmc.player.musicviz"
+        library_@PLATFORM@="@LIBRARY_FILENAME@"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en"></summary>
+        <description lang="en"></description>
+        <platform>@PLATFORM@</platform>
+        <assets>
+          <icon>resources/icon.png</icon>
+          <screenshot>resources/screenshot-01.png</screenshot>
+          <screenshot>resources/screenshot-02.png</screenshot>
+          <screenshot>resources/screenshot-03.png</screenshot>
+        </assets>
+    </extension>
+</addon>
