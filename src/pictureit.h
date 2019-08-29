@@ -101,11 +101,11 @@ private:
   // and smoother the animations
   GLfloat vis_animation_speed = 0.007f;
 
-  std::thread* m_dataLoader;
+  std::shared_ptr<std::thread> m_dataLoader;
   std::atomic<bool> m_dataLoaderActive;
   std::atomic<bool> m_dataLoaded;
 
-  std::thread* m_imgLoader;
+  std::shared_ptr<std::thread> m_imgLoader;
   std::atomic<bool> m_imgLoaderActive;
   std::atomic<bool> m_imgLoaded;
 

@@ -27,13 +27,15 @@ CVisPictureIt::CVisPictureIt()
 CVisPictureIt::~CVisPictureIt()
 {
   kodi::Log(ADDON_LOG_DEBUG, "Destructor");
-  if (m_imgLoader != nullptr)
+
+  if (m_dataLoader != nullptr)
   {
     if (m_dataLoader->joinable())
     {
       m_dataLoader->join();
     }
-    delete m_dataLoader;
+
+    m_dataLoader = nullptr;
   }
 
   if (m_imgLoader != nullptr)
@@ -42,7 +44,8 @@ CVisPictureIt::~CVisPictureIt()
     {
       m_imgLoader->join();
     }
-    delete m_imgLoader;
+
+    m_imgLoader = nullptr;
   }
 
   for (auto ptr : m_piData)
@@ -148,9 +151,11 @@ bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
   glGenBuffers(1, &m_vertexVBO);
   glGenBuffers(1, &m_indexVBO);
 
-  m_dataLoader = new std::thread(&CVisPictureIt::load_data, this, m_presetsRootDir);
+  if (!m_dataLoader)
+    m_dataLoader = std::make_shared<std::thread>(&CVisPictureIt::load_data, this, m_presetsRootDir);
 
   m_initialized = true;
+
   return true;
 }
 
@@ -205,18 +210,17 @@ void CVisPictureIt::Render()
 
     if (!m_imgLoaderActive)
     {
-      m_imgLoader = new std::thread(&CVisPictureIt::load_next_image, this);
+      m_imgLoader = std::make_shared<std::thread>(&CVisPictureIt::load_next_image, this);
     }
   }
 
   if (m_imgLoaded)
   {
     m_imgLoaded = false;
-    if (m_imgLoader->joinable())
+    if (m_imgLoader && m_imgLoader->joinable())
     {
       m_imgLoader->join();
     }
-    delete m_imgLoader;
     m_imgLoader = nullptr;
 
     if (m_imgData != nullptr)
@@ -552,7 +556,7 @@ void CVisPictureIt::load_next_image()
 {
   m_imgLoaderActive = true;
 
-  if (! m_piImages.empty())
+  if (!m_piImages.empty())
   {
     auto path = m_piImages[get_next_img_pos()].c_str();
 
