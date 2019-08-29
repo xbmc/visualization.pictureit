@@ -23,13 +23,14 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/kissfft)
 
 include_directories(${GLM_INCLUDE_DIR}
                     ${KODI_INCLUDE_DIR}/..
-                    ${PROJECT_SOURCE_DIR}/lib/kissfft) # Hack way with "/..", need bigger Kodi cmake rework to match right include ways
+                    ${PROJECT_SOURCE_DIR}/lib/kissfft)
 
 list(APPEND DEPLIBS kissfft)
 
 set(ADDON_SOURCES src/pictureit.cpp
                   src/mrfft.cpp)
-set(ADDON_HEADERS src/mrfft.h
+set(ADDON_HEADERS src/pictureit.h
+                  src/mrfft.h
                   src/stb_image.h)
 
 build_addon(visualization.pictureit ADDON DEPLIBS)
