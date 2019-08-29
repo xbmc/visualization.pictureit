@@ -1,47 +1,30 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
+project(visualization.pictureit)
 
-project(visualization.pictureit LANGUAGES CXX VERSION 0.1.6)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
-if(UNIX)
-    add_definitions(-DTARGET_LINUX)
-else()
-    message(FATAL_ERROR "This plattform is NOT supported!")
-endif()
-
-
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-
-set(CMAKE_POSITION_INDEPENDENT_CODE 1)
-
-# Make sure we use C++14
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-
-# Find and include kodi
 find_package(Kodi REQUIRED)
-find_package(p8-platform REQUIRED)
+find_package(glm REQUIRED)
 
-include_directories(${KODI_INCLUDE_DIR}
-                    ${p8-platform_INCLUDE_DIRS})
-
-
-# Find and include OpenGL
-find_package(OpenGL)
-if(OPENGL_FOUND)
-  include_directories(${OpenGL_INCLUDE_DIR})
-  add_definitions(-DHAS_OPENGL -DHAS_GL)
-  list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
+if(NOT WIN32 AND (APP_RENDER_SYSTEM STREQUAL "gl" OR NOT APP_RENDER_SYSTEM))
+  find_package(OpenGl REQUIRED)
+  set(DEPLIBS ${OPENGL_LIBRARIES})
+  set(includes ${OPENGL_INCLUDE_DIR})
+  add_definitions(${OPENGL_DEFINITIONS})
 else()
-  message(FATAL_ERROR "No rendering API found. Bailing")
+  find_package(OpenGLES REQUIRED)
+  set(DEPLIBS ${OPENGLES_LIBRARIES})
+  set(includes ${OPENGLES_INCLUDE_DIR})
+  add_definitions(${OPENGLES_DEFINITIONS})
 endif()
-
 
 # Add kissfft
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/kissfft)
-include_directories(${PROJECT_SOURCE_DIR}/lib/kissfft)
+
+include_directories(${GLM_INCLUDE_DIR}
+                    ${KODI_INCLUDE_DIR}/..
+                    ${PROJECT_SOURCE_DIR}/lib/kissfft) # Hack way with "/..", need bigger Kodi cmake rework to match right include ways
+
 list(APPEND DEPLIBS kissfft)
 
 set(ADDON_SOURCES src/pictureit.cpp
