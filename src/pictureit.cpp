@@ -48,8 +48,8 @@ static long int get_current_time_ms() {
 }
 
 
-class CVisPictureIt : public kodi::addon::CAddonBase,
-                      public kodi::addon::CInstanceVisualization {
+class ATTRIBUTE_HIDDEN CVisPictureIt : public kodi::addon::CAddonBase,
+                                       public kodi::addon::CInstanceVisualization {
 public:
     CVisPictureIt();
     virtual ~CVisPictureIt();
