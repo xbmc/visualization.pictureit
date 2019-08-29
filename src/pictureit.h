@@ -92,14 +92,14 @@ private:
 
   // Used to define some "padding" left and right.
   // If set to 1.0 the bars will go to the screen edge
-  GLfloat vis_width = 0.8f;
+  GLfloat m_visWidth = 0.8f;
 
   // If set to 1.0 the bars would be exactly on the screen edge
-  GLfloat vis_bottom_edge = 0.98f;
+  GLfloat m_visBottomEdge = 0.98f;
 
   // Animation speed. The smaler the value, the slower
   // and smoother the animations
-  GLfloat vis_animation_speed = 0.007f;
+  GLfloat m_visAnimationSpeed = 0.007f;
 
   std::shared_ptr<std::thread> m_dataLoader;
   std::atomic<bool> m_dataLoaderActive;
@@ -109,7 +109,7 @@ private:
   std::atomic<bool> m_imgLoaderActive;
   std::atomic<bool> m_imgLoaded;
 
-  unsigned char* m_imgData;
+  unsigned char* m_imgData = nullptr;
   int m_imgWidth, m_imgHeight, m_imgChannels = 0;
 
   std::unique_ptr<MRFFT> m_tranform;
@@ -192,9 +192,15 @@ private:
   int m_prevFreqDataLength = 0;
 
   bool m_textureUsed = false;
-  glm::mat4 m_projMat;
-  glm::mat4 m_modelMat;
-  GLubyte m_index[4] = {0, 1, 3, 2};
+
+  // OpenGL projection matrix setup
+  // Coordinate-System:
+  //     screen top left:     (-1, -1)
+  //     screen center:       ( 0,  0)
+  //     screen bottom right: ( 1,  1)
+  const glm::mat4 m_projMat = glm::ortho(-1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f);
+  const glm::mat4 m_modelMat = glm::mat4(1.0f);
+  const GLubyte m_index[4] = {0, 1, 3, 2};
 
   GLint m_projMatLoc = -1;
   GLint m_modelViewMatLoc = -1;

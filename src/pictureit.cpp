@@ -1,33 +1,30 @@
 #include "pictureit.h"
 
-#include <algorithm>
-#include <random>
-
+#include "mrfft.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_JPEG
 #define STBI_ONLY_PNG
 #define STBI_ONLY_BMP
 #include "stb_image.h"
 
-#include "mrfft.h"
+#include <algorithm>
+#include <random>
 
-static const std::string img_filter = ".jpg|.jpeg|.png";
+namespace
+{
+const std::string img_filter = ".jpg|.jpeg|.png";
+}
 
 CVisPictureIt::CVisPictureIt()
+  : m_dataLoaderActive(false),
+    m_dataLoaded(false),
+    m_imgLoaderActive(false),
+    m_imgLoaded(false)
 {
-  kodi::Log(ADDON_LOG_DEBUG, "Constructor");
-
-  m_dataLoaded = false;
-  m_imgLoaderActive = false;
-  m_imgLoaded = false;
-
-  m_imgData = nullptr;
 }
 
 CVisPictureIt::~CVisPictureIt()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "Destructor");
-
   if (m_dataLoader != nullptr)
   {
     if (m_dataLoader->joinable())
@@ -59,8 +56,6 @@ CVisPictureIt::~CVisPictureIt()
 
 ADDON_STATUS CVisPictureIt::Create()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "Create");
-
   m_presetsRootDir = kodi::GetSettingString("presets_root_dir");
 
   m_updateOnNewTrack = kodi::GetSettingBoolean("update_on_new_track");
@@ -70,67 +65,55 @@ ADDON_STATUS CVisPictureIt::Create()
   m_visEnabled = kodi::GetSettingBoolean("vis_enabled");
   m_visBgEnabled = kodi::GetSettingBoolean("vis_bg_enabled");
 
-  vis_width = kodi::GetSettingInt("vis_half_width");
-  vis_width = vis_width * 1.0f / 100;
+  m_visWidth = kodi::GetSettingInt("vis_half_width");
+  m_visWidth = m_visWidth * 1.0f / 100;
 
-  vis_animation_speed = kodi::GetSettingInt("vis_animation_speed");
-  vis_animation_speed = vis_animation_speed * 0.005f / 100;
+  m_visAnimationSpeed = kodi::GetSettingInt("vis_animation_speed");
+  m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
 
   float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
-  vis_bottom_edge = scale[kodi::GetSettingInt("vis_bottom_edge")];
+  m_visBottomEdge = scale[kodi::GetSettingInt("vis_bottom_edge")];
 
   return ADDON_STATUS_OK;
 }
 
 bool CVisPictureIt::GetPresets(std::vector<std::string>& presets)
 {
-  kodi::Log(ADDON_LOG_DEBUG, "GetPresets");
-
   load_presets(m_presetsRootDir);
   if (m_piPresets.empty())
-  {
     return false;
-  }
 
   for (unsigned int i = 0; i < m_piPresets.size(); i++)
-  {
-    kodi::Log(ADDON_LOG_DEBUG, "Adding preset: %s", m_piPresets[i].c_str());
     presets.push_back(m_piPresets[i]);
-  }
 
   return true;
 }
 
 int CVisPictureIt::GetActivePreset()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "GetActivePreset");
   return static_cast<int>(m_presetIndex);
 }
 
 bool CVisPictureIt::NextPreset()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "NextPreset");
   select_preset((m_presetIndex + 1) % m_piPresets.size());
   return true;
 }
 
 bool CVisPictureIt::PrevPreset()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "PrevPreset");
   select_preset((m_presetIndex - 1) % m_piPresets.size());
   return true;
 }
 
 bool CVisPictureIt::LoadPreset(int select)
 {
-  kodi::Log(ADDON_LOG_DEBUG, "LoadPreset");
   select_preset(select % m_piPresets.size());
   return true;
 }
 
 bool CVisPictureIt::RandomPreset()
 {
-  kodi::Log(ADDON_LOG_DEBUG, "RandomPreset");
   select_preset((int)((std::rand() / (float)RAND_MAX) * m_piPresets.size()));
   return true;
 }
@@ -138,8 +121,6 @@ bool CVisPictureIt::RandomPreset()
 bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
                           int iBitsPerSample, std::string szSongName)
 {
-  kodi::Log(ADDON_LOG_DEBUG, "Start");
-
   if (!m_shadersLoaded)
   {
     std::string fraqShader = kodi::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
@@ -166,8 +147,6 @@ void CVisPictureIt::Stop()
 
   m_initialized = false;
 
-  kodi::Log(ADDON_LOG_DEBUG, "Stop");
-
   glDeleteBuffers(1, &m_vertexVBO);
   m_vertexVBO = 0;
   glDeleteBuffers(1, &m_indexVBO);
@@ -176,7 +155,6 @@ void CVisPictureIt::Stop()
 
 bool CVisPictureIt::UpdateTrack(const VisTrack &track)
 {
-  kodi::Log(ADDON_LOG_DEBUG, "UpdateTrack");
   if (m_updateOnNewTrack)
   {
     m_updateImg = true;
@@ -279,7 +257,6 @@ void CVisPictureIt::Render()
     draw_image(m_imgTextureIds[1], m_fadeCurrent);
   }
 
-
   if (m_visEnabled)
   {
     m_textureUsed = false;
@@ -290,13 +267,10 @@ void CVisPictureIt::Render()
     if (m_visBgEnabled)
     {
       sLight framedTextures[4];
-      framedTextures[0].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
-      framedTextures[0].vertex = sPosition(1.0f, (vis_bottom_edge - m_visBarMaxHeight) - (1.0f - vis_bottom_edge));
-      framedTextures[1].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
-      framedTextures[1].vertex = sPosition(-1.0f,(vis_bottom_edge - m_visBarMaxHeight) - (1.0f - vis_bottom_edge));
-      framedTextures[2].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
+      framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
+      framedTextures[0].vertex = sPosition(1.0f, (m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
+      framedTextures[1].vertex = sPosition(-1.0f,(m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
       framedTextures[2].vertex = sPosition(-1.0f, 1.0f);
-      framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
       framedTextures[3].vertex = sPosition( 1.0f, 1.0f);
 
       glEnable(GL_BLEND);
@@ -310,12 +284,12 @@ void CVisPictureIt::Render()
     // This needs to be done to ensure the exact same height-value for both
     // the left and the (mirrored) right bar
     GLfloat x1, x2;
-    float bar_width = vis_width / m_visBarCount;
+    float bar_width = m_visWidth / m_visBarCount;
     for (int i = 1; i <= m_visBarCount; i++)
     {
       // calculate position
-      x1 = (vis_width * -1) + (i * bar_width) - bar_width;
-      x2 = (vis_width * -1) + (i * bar_width);
+      x1 = (m_visWidth * -1) + (i * bar_width) - bar_width;
+      x2 = (m_visWidth * -1) + (i * bar_width);
 
       // "add" a gap (which is 1/4 of the initial bar_width)
       // to both the left and right side of the bar
@@ -332,12 +306,10 @@ void CVisPictureIt::Render()
 }
 
 void CVisPictureIt::AudioData(const float* pAudioData, int iAudioDataLength,
-                              float *pFreqData, int iFreqDataLength)
+                              float* pFreqData, int iFreqDataLength)
 {
-  if (!m_visEnabled)
-  {
+  if (!m_visEnabled || !m_initialized)
     return;
-  }
 
   iFreqDataLength = iAudioDataLength / 2;
   iFreqDataLength -= iFreqDataLength % 2;
@@ -351,11 +323,11 @@ void CVisPictureIt::AudioData(const float* pAudioData, int iAudioDataLength,
   // Further this gives us the ability to change the response if needed (They return the magnitude per default I believe)
   if (m_prevFreqDataLength != iFreqDataLength || ! m_tranform)
   {
-        m_tranform.reset(new MRFFT(iFreqDataLength, true));
+    m_tranform.reset(new MRFFT(iFreqDataLength, true));
     m_prevFreqDataLength = iFreqDataLength;
   }
 
-    m_tranform->calc(pAudioData, freq_data);
+  m_tranform->calc(pAudioData, freq_data);
 
   // Now that we have our values (as I said, the magnitude I guess) we just display them without a whole
   // lot of modification.
@@ -591,7 +563,6 @@ void CVisPictureIt::draw_image(GLuint img_tex_id, float opacity)
 
   sLight framedTextures[4];
 
-
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -640,31 +611,31 @@ void CVisPictureIt::draw_bars(int i, GLfloat x1, GLfloat x2)
 
     if (m_cvisBarHeights[i] < m_visBarHeights[i])
     {
-      m_cvisBarHeights[i] += vis_animation_speed + gravity;
+      m_cvisBarHeights[i] += m_visAnimationSpeed + gravity;
     }
     else
     {
-      m_cvisBarHeights[i] -= vis_animation_speed + gravity;
+      m_cvisBarHeights[i] -= m_visAnimationSpeed + gravity;
     }
   }
 
   m_pvisBarHeights[i] = m_visBarHeights[i];
-  GLfloat y2 = vis_bottom_edge - m_cvisBarHeights[i];
+  GLfloat y2 = m_visBottomEdge - m_cvisBarHeights[i];
 
   sLight framedTextures[4];
   framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(1.0f, 1.0f, 1.0f, 1.0f);
 
   framedTextures[0].vertex = sPosition(x1, y2);               // Top Left
   framedTextures[1].vertex = sPosition(x2, y2);               // Top Right
-  framedTextures[2].vertex = sPosition(x2, vis_bottom_edge);  // Bottom Right
-  framedTextures[3].vertex = sPosition(x1, vis_bottom_edge);  // Bottom Left
+  framedTextures[2].vertex = sPosition(x2, m_visBottomEdge);  // Bottom Right
+  framedTextures[3].vertex = sPosition(x1, m_visBottomEdge);  // Bottom Left
   glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 
   framedTextures[0].vertex = sPosition(-x2, y2);               // Top Left
   framedTextures[1].vertex = sPosition(-x1, y2);               // Top Right
-  framedTextures[2].vertex = sPosition(-x1, vis_bottom_edge);  // Bottom Right
-  framedTextures[3].vertex = sPosition(-x2, vis_bottom_edge);  // Bottom Left
+  framedTextures[2].vertex = sPosition(-x1, m_visBottomEdge);  // Bottom Right
+  framedTextures[3].vertex = sPosition(-x2, m_visBottomEdge);  // Bottom Left
   glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 }
@@ -676,14 +647,6 @@ void CVisPictureIt::start_render()
    */
   // Clear The Screen And The Depth Buffer
   glClear(GL_COLOR_BUFFER_BIT);
-
-  // OpenGL projection matrix setup
-  // Coordinate-System:
-  //     screen top left:     (-1, -1)
-  //     screen center:       ( 0,  0)
-  //     screen bottom right: ( 1,  1)
-  m_projMat = glm::ortho(-1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f);
-  m_modelMat = glm::mat4(1.0f);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
