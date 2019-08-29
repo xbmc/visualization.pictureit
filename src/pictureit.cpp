@@ -49,24 +49,25 @@ static long int get_current_time_ms() {
 
 
 class ATTRIBUTE_HIDDEN CVisPictureIt : public kodi::addon::CAddonBase,
-                                       public kodi::addon::CInstanceVisualization {
+                                       public kodi::addon::CInstanceVisualization
+{
 public:
     CVisPictureIt();
-    virtual ~CVisPictureIt();
+    ~CVisPictureIt() override;
 
-    virtual ADDON_STATUS Create() override;
-    virtual bool GetPresets(std::vector<std::string>& presets) override;
-    virtual int GetActivePreset() override;
-    virtual bool PrevPreset() override;
-    virtual bool NextPreset() override;
-    virtual bool LoadPreset(int select) override;
-    virtual bool RandomPreset() override;
-    virtual bool Start(int channels, int samplesPerSec, int bitsPerSample,
-                       std::string songName) override;
-    virtual void Stop() override;
-    virtual void Render() override;
-    virtual void AudioData(const float*, int, float*, int) override;
-    virtual bool UpdateTrack(const VisTrack &track) override;
+    ADDON_STATUS Create() override;
+    bool GetPresets(std::vector<std::string>& presets) override;
+    int GetActivePreset() override;
+    bool PrevPreset() override;
+    bool NextPreset() override;
+    bool LoadPreset(int select) override;
+    bool RandomPreset() override;
+    bool Start(int channels, int samplesPerSec, int bitsPerSample,
+               std::string songName) override;
+    void Stop() override;
+    void Render() override;
+    void AudioData(const float*, int, float*, int) override;
+    bool UpdateTrack(const VisTrack &track) override;
 
     /*
      * Settings
