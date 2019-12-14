@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <atomic>
+#include <mutex>
 #include <thread>
 
 struct sPosition
@@ -216,4 +217,7 @@ private:
 
   bool m_initialized = false;
   bool m_shadersLoaded = false;
+
+  unsigned int m_get_next_img_pos_Calls = 0;
+  std::mutex m_mutex;
 };

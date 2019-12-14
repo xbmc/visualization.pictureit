@@ -187,7 +187,7 @@ void CVisPictureIt::Render()
       glDeleteTextures(1, &m_imgTextureIds[2]);
     }
 
-    if (!m_imgLoaderActive)
+    if (!m_imgLoaderActive && !m_imgLoader)
     {
       m_imgLoader = std::make_shared<std::thread>(&CVisPictureIt::load_next_image, this);
     }
@@ -435,9 +435,10 @@ int CVisPictureIt::get_next_img_pos()
   std::uniform_int_distribution<int> dist(0, m_piImages.size() - 1);
 
   int num = dist(engine);
-  if (num == m_imgCurrentPos)
+  if (num == m_imgCurrentPos && m_get_next_img_pos_Calls++ < 10) // try only 10 times to prevent possible dead loop
     return get_next_img_pos();
 
+  m_get_next_img_pos_Calls = 0;
   m_imgCurrentPos = num;
   return m_imgCurrentPos;
 }
@@ -462,6 +463,8 @@ void CVisPictureIt::load_presets(const std::string& path)
 
 void CVisPictureIt::load_data(const std::string& path)
 {
+  const std::lock_guard<std::mutex> lock(m_mutex);
+
   /**
    * Load presets and all associated images
    */
@@ -527,6 +530,8 @@ void CVisPictureIt::select_preset(unsigned int index)
 
 void CVisPictureIt::load_next_image()
 {
+  const std::lock_guard<std::mutex> lock(m_mutex);
+
   m_imgLoaderActive = true;
 
   if (!m_piImages.empty())
