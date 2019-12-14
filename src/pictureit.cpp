@@ -127,6 +127,7 @@ bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
     std::string vertShader = kodi::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
     if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
       return false;
+    m_shadersLoaded = true;
   }
 
   glGenBuffers(1, &m_vertexVBO);
