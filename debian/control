@@ -1,0 +1,24 @@
+Source: kodi-visualization-pictureit
+Priority: extra
+Maintainer: Nobody <nobody@kodi.tv>
+Build-Depends: debhelper (>= 9.0.0), cmake, kodi-addon-dev,
+               libgles2-mesa-dev [arm64 armhf], libgl1-mesa-dev [i386 amd64],
+               libglm-dev
+Standards-Version: 4.1.2
+Section: libs
+Homepage: http://kodi.tv
+
+Package: kodi-visualization-pictureit
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: pictureit visualizer for Kodi
+ PictureIt visualizer for Kodi
+
+Package: kodi-visualization-pictureit-dbg
+Section: debug
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: debug symbols for pictureit visualizer for Kodi
+ debug symbols for PictureIt visualizer for Kodi
+
