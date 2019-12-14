@@ -219,5 +219,6 @@ private:
   bool m_shadersLoaded = false;
 
   unsigned int m_get_next_img_pos_Calls = 0;
+  std::string m_last_path;
   std::mutex m_mutex;
 };

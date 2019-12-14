@@ -537,6 +537,9 @@ void CVisPictureIt::load_next_image()
   if (!m_piImages.empty())
   {
     auto path = m_piImages[get_next_img_pos()].c_str();
+    if (path == m_last_path)
+      return;
+    m_last_path = path;
 
     kodi::Log(ADDON_LOG_DEBUG, "Loading image: %s", path);
     m_imgData = stbi_load(path, &m_imgWidth, &m_imgHeight, &m_imgChannels, STBI_rgb_alpha);
