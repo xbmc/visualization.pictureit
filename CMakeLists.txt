@@ -23,7 +23,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/kissfft)
 
 include_directories(${GLM_INCLUDE_DIR}
                     ${KODI_INCLUDE_DIR}/..
-                    ${PROJECT_SOURCE_DIR}/lib
                     ${PROJECT_SOURCE_DIR}/lib/kissfft)
 
 list(APPEND DEPLIBS kissfft)
