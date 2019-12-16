@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="visualization.pictureit"
-    version="2.0.0"
+    version="3.0.0"
     name="PictureIt"
     provider-name="linuxwhatelse">
     <requires>@ADDON_DEPENDS@</requires>
@@ -9,14 +9,30 @@
         point="xbmc.player.musicviz"
         library_@PLATFORM@="@LIBRARY_FILENAME@"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en"></summary>
-        <description lang="en"></description>
+        <summary lang="en">PictureIt - Kodi Visualization</summary>
+        <description lang="en">PictureIt is supposed to make listening to music more elegant and less flashy.
+The idea is to take random images YOU selected and display them alongside a simple spectrum at the bottom.
+Simple right?
+
+Features:
+- Select a local directory containing your images (If sub-folders are present, those will be used as "Preset")
+- Update images by interval
+- Update images on new track
+- Change the transition time
+- Enable/Disable the spectrum
+- Enable/Disable a settle spectrum-background
+- Change the spectrums: Width, Bottom-Padding, Animation-Speed
+        </description>
         <platform>@PLATFORM@</platform>
+        <license>GPL-2.0</license>
+        <source>https://github.com/linuxwhatelse/visualization.pictureit</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=236514</forum>
         <assets>
           <icon>resources/icon.png</icon>
-          <screenshot>resources/screenshot-01.png</screenshot>
-          <screenshot>resources/screenshot-02.png</screenshot>
-          <screenshot>resources/screenshot-03.png</screenshot>
+          <fanart>resources/fanart.jpg</fanart>
+          <screenshot>resources/fanart.jpg</screenshot>
+          <screenshot>resources/screenshot-01.jpg</screenshot>
+          <screenshot>resources/screenshot-02.jpg</screenshot>
         </assets>
     </extension>
 </addon>
