@@ -9,8 +9,8 @@
         point="xbmc.player.musicviz"
         library_@PLATFORM@="@LIBRARY_FILENAME@"/>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en">PictureIt - Kodi Visualization</summary>
-        <description lang="en">PictureIt is supposed to make listening to music more elegant and less flashy.
+        <summary lang="en_GB">PictureIt - Kodi Visualization</summary>
+        <description lang="en_GB">PictureIt is supposed to make listening to music more elegant and less flashy.
 The idea is to take random images YOU selected and display them alongside a simple spectrum at the bottom.
 Simple right?
 
