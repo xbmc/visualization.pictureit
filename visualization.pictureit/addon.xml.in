@@ -24,7 +24,7 @@ Features:
 - Change the spectrums: Width, Bottom-Padding, Animation-Speed
         </description>
         <platform>@PLATFORM@</platform>
-        <license>GPL-2.0</license>
+        <license>GPL-2.0-or-later</license>
         <source>https://github.com/linuxwhatelse/visualization.pictureit</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=236514</forum>
         <assets>
