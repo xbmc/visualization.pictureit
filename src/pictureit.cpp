@@ -154,7 +154,7 @@ void CVisPictureIt::Stop()
   m_indexVBO = 0;
 }
 
-bool CVisPictureIt::UpdateTrack(const VisTrack &track)
+bool CVisPictureIt::UpdateTrack(const kodi::addon::VisualizationTrack& track)
 {
   if (m_updateOnNewTrack)
   {
