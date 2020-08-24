@@ -62,7 +62,7 @@ public:
   void Stop() override;
   void Render() override;
   void AudioData(const float*, int, float*, int) override;
-  bool UpdateTrack(const VisTrack &track) override;
+  bool UpdateTrack(const kodi::addon::VisualizationTrack& track) override;
 
   // kodi::gui::gl::CShaderProgram
   void OnCompiledAndLinked() override;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
     id="visualization.pictureit"
-    version="3.2.0"
+    version="3.3.0"
     name="PictureIt"
     provider-name="linuxwhatelse">
     <requires>@ADDON_DEPENDS@</requires>
@@ -9,7 +9,20 @@
         point="xbmc.player.musicviz"
         library_@PLATFORM@="@LIBRARY_FILENAME@"/>
     <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">PictureIt - Kodi-Visualisierung</summary>
         <summary lang="en_GB">PictureIt - Kodi Visualization</summary>
+        <description lang="de_DE">PictureIt soll das Musikhören eleganter und weniger auffällig machen.
+Die Idee ist, zufällige Bilder aufzunehmen, die SIE ausgewählt haben, und sie neben einem einfachen Spektrum unten anzuzeigen.
+Einfach richtig?
+
+Eigenschaften:
+- Wählen Sie ein lokales Verzeichnis mit Ihren Bildern aus (wenn Unterordner vorhanden sind, werden diese als "Voreinstellung" verwendet).
+- Aktualisieren Sie die Bilder nach Intervallen
+- Bilder auf neuem Track aktualisieren
+- Ändern Sie die Übergangszeit
+- Aktivieren / Deaktivieren Sie das Spektrum
+- Aktivieren / Deaktivieren eines Hintergrunds für das Spektrum
+- Ändern Sie die Spektren: Breite, Bodenauffüllung, Animationsgeschwindigkeit</description>
         <description lang="en_GB">PictureIt is supposed to make listening to music more elegant and less flashy.
 The idea is to take random images YOU selected and display them alongside a simple spectrum at the bottom.
 Simple right?
@@ -21,8 +34,7 @@ Features:
 - Change the transition time
 - Enable/Disable the spectrum
 - Enable/Disable a settle spectrum-background
-- Change the spectrums: Width, Bottom-Padding, Animation-Speed
-        </description>
+- Change the spectrums: Width, Bottom-Padding, Animation-Speed</description>
         <platform>@PLATFORM@</platform>
         <license>GPL-2.0-or-later</license>
         <source>https://github.com/linuxwhatelse/visualization.pictureit</source>
