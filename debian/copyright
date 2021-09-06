@@ -2,7 +2,7 @@ Format: http://dep.debian.net/deps/dep5
 Upstream-Name: visualization.pictureit
 
 Files: *
-Copyright: 2018-2019 Team Kodi
+Copyright: 2018-2021 Team Kodi
            2015-2019 LinuxWhatElse
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ License: GPL-2+
 
 
 Files: debian/*
-Copyright: 2019 Team Kodi
+Copyright: 2019-2021 Team Kodi
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
