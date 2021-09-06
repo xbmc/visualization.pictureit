@@ -19,10 +19,8 @@ Simple right?
  * Change the spectrums: Width, Bottom-Padding, Animation-Speed
 
 ## Installation
- 1. Install the [linuxwhatelse repository](http://linuxwhatelse.de/projects/kodi/repo/repository.linuxwhatelse.zip)
- 2. Install PictureIt
- 3. In the add-on configuration set the path to a directory holding your images/wallpapers
- 4. Done!
+ The addon is available for all OS by addon download inside Kodi, except Linux where related distribution need to bring it.
+ To build yourself can be instructions found here https://github.com/xbmc/xbmc/tree/master/docs.
 
 ## ToDo
  * Rework the spectrum.<br>
