@@ -1,6 +1,8 @@
 PictureIt - Kodi Visualization
 ==============================
 
+[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL%20v2+-blue.svg)](LICENSE.md)
+
 PictureIt is supposed to make listening to music more elegant and less flashy.<br>
 The idea is to take random images YOU selected and display them alongside a simple spectrum at the bottom.<br>
 Simple right?
