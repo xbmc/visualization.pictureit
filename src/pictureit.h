@@ -50,9 +50,9 @@ class MRFFT;
 typedef std::vector<std::string> td_vec_str;
 typedef std::map<std::string, td_vec_str> td_map_data;
 
-class ATTRIBUTE_HIDDEN CVisPictureIt : public kodi::addon::CAddonBase,
-                                       public kodi::addon::CInstanceVisualization,
-                                       public kodi::gui::gl::CShaderProgram
+class ATTR_DLL_LOCAL CVisPictureIt : public kodi::addon::CAddonBase,
+                                     public kodi::addon::CInstanceVisualization,
+                                     public kodi::gui::gl::CShaderProgram
 {
 public:
   CVisPictureIt();
