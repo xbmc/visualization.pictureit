@@ -64,23 +64,23 @@ CVisPictureIt::~CVisPictureIt()
 
 ADDON_STATUS CVisPictureIt::Create()
 {
-  m_presetsRootDir = kodi::GetSettingString("presets_root_dir");
+  m_presetsRootDir = kodi::addon::GetSettingString("presets_root_dir");
 
-  m_updateOnNewTrack = kodi::GetSettingBoolean("update_on_new_track");
-  m_updateByInterval = kodi::GetSettingBoolean("update_by_interval");
-  m_imgUpdateInterval = kodi::GetSettingInt("img_update_interval");
-  m_fadeTimeMs = kodi::GetSettingInt("fade_time_ms");
-  m_visEnabled = kodi::GetSettingBoolean("vis_enabled");
-  m_visBgEnabled = kodi::GetSettingBoolean("vis_bg_enabled");
+  m_updateOnNewTrack = kodi::addon::GetSettingBoolean("update_on_new_track");
+  m_updateByInterval = kodi::addon::GetSettingBoolean("update_by_interval");
+  m_imgUpdateInterval = kodi::addon::GetSettingInt("img_update_interval");
+  m_fadeTimeMs = kodi::addon::GetSettingInt("fade_time_ms");
+  m_visEnabled = kodi::addon::GetSettingBoolean("vis_enabled");
+  m_visBgEnabled = kodi::addon::GetSettingBoolean("vis_bg_enabled");
 
-  m_visWidth = kodi::GetSettingInt("vis_half_width");
+  m_visWidth = kodi::addon::GetSettingInt("vis_half_width");
   m_visWidth = m_visWidth * 1.0f / 100;
 
-  m_visAnimationSpeed = kodi::GetSettingInt("vis_animation_speed");
+  m_visAnimationSpeed = kodi::addon::GetSettingInt("vis_animation_speed");
   m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
 
   float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
-  m_visBottomEdge = scale[kodi::GetSettingInt("vis_bottom_edge")];
+  m_visBottomEdge = scale[kodi::addon::GetSettingInt("vis_bottom_edge")];
 
   return ADDON_STATUS_OK;
 }
@@ -131,8 +131,8 @@ bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
 {
   if (!m_shadersLoaded)
   {
-    std::string fraqShader = kodi::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
-    std::string vertShader = kodi::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
+    std::string fraqShader = kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
+    std::string vertShader = kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
     if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
       return false;
     m_shadersLoaded = true;
