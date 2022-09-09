@@ -127,7 +127,7 @@ bool CVisPictureIt::RandomPreset()
 }
 
 bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
-                          int iBitsPerSample, std::string szSongName)
+                          int iBitsPerSample, const std::string& szSongName)
 {
   if (!m_shadersLoaded)
   {
@@ -314,13 +314,12 @@ void CVisPictureIt::Render()
   finish_render();
 }
 
-void CVisPictureIt::AudioData(const float* pAudioData, int iAudioDataLength,
-                              float* pFreqData, int iFreqDataLength)
+void CVisPictureIt::AudioData(const float* pAudioData, size_t iAudioDataLength)
 {
   if (!m_visEnabled || !m_initialized)
     return;
 
-  iFreqDataLength = iAudioDataLength / 2;
+  size_t iFreqDataLength = iAudioDataLength / 2;
   iFreqDataLength -= iFreqDataLength % 2;
 
   float* freq_data = new float[iFreqDataLength];
