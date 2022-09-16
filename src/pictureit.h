@@ -66,10 +66,10 @@ public:
   bool LoadPreset(int select) override;
   bool RandomPreset() override;
   bool Start(int channels, int samplesPerSec, int bitsPerSample,
-              std::string songName) override;
+             const std::string& songName) override;
   void Stop() override;
   void Render() override;
-  void AudioData(const float*, int, float*, int) override;
+  void AudioData(const float* audioData, size_t audioDataLength) override;
   bool UpdateTrack(const kodi::addon::VisualizationTrack& track) override;
 
   // kodi::gui::gl::CShaderProgram
