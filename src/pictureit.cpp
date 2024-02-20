@@ -138,6 +138,8 @@ bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
     m_shadersLoaded = true;
   }
 
+  glGenVertexArrays(1, &m_vao);
+
   glGenBuffers(1, &m_vertexVBO);
   glGenBuffers(1, &m_indexVBO);
 
@@ -160,6 +162,8 @@ void CVisPictureIt::Stop()
   m_vertexVBO = 0;
   glDeleteBuffers(1, &m_indexVBO);
   m_indexVBO = 0;
+
+  glDeleteVertexArrays(1, &m_vao);
 }
 
 bool CVisPictureIt::UpdateTrack(const kodi::addon::VisualizationTrack& track)
@@ -175,6 +179,8 @@ void CVisPictureIt::Render()
 {
   if (!m_initialized)
     return;
+
+  glBindVertexArray(m_vao);
 
   start_render();
 
@@ -312,6 +318,8 @@ void CVisPictureIt::Render()
   }
 
   finish_render();
+
+  glBindVertexArray(0);
 }
 
 void CVisPictureIt::AudioData(const float* pAudioData, size_t iAudioDataLength)
