@@ -16,6 +16,7 @@
 #include "stb_image.h"
 
 #include <algorithm>
+#include <chrono>
 #include <random>
 
 namespace
