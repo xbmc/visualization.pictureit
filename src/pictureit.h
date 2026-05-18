@@ -56,20 +56,16 @@ class ATTR_DLL_LOCAL CVisPictureIt : public kodi::addon::CAddonBase,
 {
 public:
   CVisPictureIt();
-  ~CVisPictureIt() override;
+  ~CVisPictureIt() override = default;
 
-  ADDON_STATUS Create() override;
+  bool Init() override;
+  void DeInit() override;
   bool GetPresets(std::vector<std::string>& presets) override;
   int GetActivePreset() override;
   bool PrevPreset() override;
   bool NextPreset() override;
   bool LoadPreset(int select) override;
   bool RandomPreset() override;
-  bool Start(int channels,
-             int samplesPerSec,
-             int bitsPerSample,
-             const std::string& songName) override;
-  void Stop() override;
   void Render() override;
   void AudioData(const float* audioData, size_t audioDataLength) override;
   bool UpdateTrack(const kodi::addon::VisualizationTrack& track) override;

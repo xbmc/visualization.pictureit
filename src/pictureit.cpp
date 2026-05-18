@@ -30,10 +30,56 @@ CVisPictureIt::CVisPictureIt()
     m_imgLoaderActive(false),
     m_imgLoaded(false)
 {
+  // Load settings on constuctor to have on "GetPresets(...)" call available.
+  m_presetsRootDir = kodi::addon::GetSettingString("presets_root_dir");
+  m_updateOnNewTrack = kodi::addon::GetSettingBoolean("update_on_new_track");
+  m_updateByInterval = kodi::addon::GetSettingBoolean("update_by_interval");
+  m_imgUpdateInterval = kodi::addon::GetSettingInt("img_update_interval");
+  m_fadeTimeMs = kodi::addon::GetSettingInt("fade_time_ms");
+  m_visEnabled = kodi::addon::GetSettingBoolean("vis_enabled");
+  m_visBgEnabled = kodi::addon::GetSettingBoolean("vis_bg_enabled");
+
+  m_visWidth = kodi::addon::GetSettingInt("vis_half_width");
+  m_visWidth = m_visWidth * 1.0f / 100;
+
+  m_visAnimationSpeed = kodi::addon::GetSettingInt("vis_animation_speed");
+  m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
+
+  float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
+  m_visBottomEdge = scale[kodi::addon::GetSettingInt("vis_bottom_edge")];
 }
 
-CVisPictureIt::~CVisPictureIt()
+bool CVisPictureIt::Init()
 {
+  if (!m_shadersLoaded)
+  {
+    std::string fraqShader =
+        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
+    std::string vertShader =
+        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
+    if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
+      return false;
+    m_shadersLoaded = true;
+  }
+
+  glGenBuffers(1, &m_vertexVBO);
+  glGenBuffers(1, &m_indexVBO);
+
+  if (!m_dataLoader)
+    m_dataLoader = std::make_shared<std::thread>(&CVisPictureIt::load_data, this, m_presetsRootDir);
+
+  m_initialized = true;
+
+  return true;
+}
+
+void CVisPictureIt::DeInit()
+{
+  if (!m_initialized)
+    return;
+
+  m_initialized = false;
+
   if (m_dataLoader != nullptr)
   {
     if (m_dataLoader->joinable())
@@ -60,30 +106,12 @@ CVisPictureIt::~CVisPictureIt()
   }
   m_piData.clear();
 
+  glDeleteBuffers(1, &m_vertexVBO);
+  m_vertexVBO = 0;
+  glDeleteBuffers(1, &m_indexVBO);
+  m_indexVBO = 0;
+
   glDeleteTextures(3, m_imgTextureIds);
-}
-
-ADDON_STATUS CVisPictureIt::Create()
-{
-  m_presetsRootDir = kodi::addon::GetSettingString("presets_root_dir");
-
-  m_updateOnNewTrack = kodi::addon::GetSettingBoolean("update_on_new_track");
-  m_updateByInterval = kodi::addon::GetSettingBoolean("update_by_interval");
-  m_imgUpdateInterval = kodi::addon::GetSettingInt("img_update_interval");
-  m_fadeTimeMs = kodi::addon::GetSettingInt("fade_time_ms");
-  m_visEnabled = kodi::addon::GetSettingBoolean("vis_enabled");
-  m_visBgEnabled = kodi::addon::GetSettingBoolean("vis_bg_enabled");
-
-  m_visWidth = kodi::addon::GetSettingInt("vis_half_width");
-  m_visWidth = m_visWidth * 1.0f / 100;
-
-  m_visAnimationSpeed = kodi::addon::GetSettingInt("vis_animation_speed");
-  m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
-
-  float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
-  m_visBottomEdge = scale[kodi::addon::GetSettingInt("vis_bottom_edge")];
-
-  return ADDON_STATUS_OK;
 }
 
 bool CVisPictureIt::GetPresets(std::vector<std::string>& presets)
@@ -125,46 +153,6 @@ bool CVisPictureIt::RandomPreset()
 {
   select_preset((int)((std::rand() / (float)RAND_MAX) * m_piPresets.size()));
   return true;
-}
-
-bool CVisPictureIt::Start(int iChannels,
-                          int iSamplesPerSec,
-                          int iBitsPerSample,
-                          const std::string& szSongName)
-{
-  if (!m_shadersLoaded)
-  {
-    std::string fraqShader =
-        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
-    std::string vertShader =
-        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
-    if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
-      return false;
-    m_shadersLoaded = true;
-  }
-
-  glGenBuffers(1, &m_vertexVBO);
-  glGenBuffers(1, &m_indexVBO);
-
-  if (!m_dataLoader)
-    m_dataLoader = std::make_shared<std::thread>(&CVisPictureIt::load_data, this, m_presetsRootDir);
-
-  m_initialized = true;
-
-  return true;
-}
-
-void CVisPictureIt::Stop()
-{
-  if (!m_initialized)
-    return;
-
-  m_initialized = false;
-
-  glDeleteBuffers(1, &m_vertexVBO);
-  m_vertexVBO = 0;
-  glDeleteBuffers(1, &m_indexVBO);
-  m_indexVBO = 0;
 }
 
 bool CVisPictureIt::UpdateTrack(const kodi::addon::VisualizationTrack& track)
