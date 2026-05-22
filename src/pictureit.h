@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018-2021 Team Kodi (https://kodi.tv)
+ *  Copyright (C) 2018-2026 Team Kodi (https://kodi.tv)
  *  Copyright (C) 2015-2019 LinuxWhatElse
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -8,34 +8,34 @@
 
 #pragma once
 
-#include <kodi/addon-instance/Visualization.h>
-#include <kodi/gui/gl/GL.h>
-#include <kodi/gui/gl/Shader.h>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <atomic>
 #include <mutex>
 #include <thread>
+
+#include <glm/gtc/type_ptr.hpp>
+#include <kodi/addon-instance/Visualization.h>
+#include <kodi/gui/gl/GL.h>
+#include <kodi/gui/gl/Shader.h>
 
 struct sPosition
 {
   sPosition() : x(0.0f), y(0.0f), z(0.0f), u(1.0f) {}
   sPosition(float x, float y, float z = 0.0f) : x(x), y(y), z(z), u(1.0f) {}
-  float x,y,z,u;
+  float x, y, z, u;
 };
 
 struct sCoord
 {
   sCoord() : u(0.0f), v(0.0f) {}
   sCoord(float u, float v) : u(u), v(v) {}
-  float u,v;
+  float u, v;
 };
 
 struct sColor
 {
   sColor() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
   sColor(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
-  float r,g,b,a;
+  float r, g, b, a;
 };
 
 struct sLight
@@ -56,18 +56,16 @@ class ATTR_DLL_LOCAL CVisPictureIt : public kodi::addon::CAddonBase,
 {
 public:
   CVisPictureIt();
-  ~CVisPictureIt() override;
+  ~CVisPictureIt() override = default;
 
-  ADDON_STATUS Create() override;
+  bool Init() override;
+  void DeInit() override;
   bool GetPresets(std::vector<std::string>& presets) override;
   int GetActivePreset() override;
   bool PrevPreset() override;
   bool NextPreset() override;
   bool LoadPreset(int select) override;
   bool RandomPreset() override;
-  bool Start(int channels, int samplesPerSec, int bitsPerSample,
-             const std::string& songName) override;
-  void Stop() override;
   void Render() override;
   void AudioData(const float* audioData, size_t audioDataLength) override;
   bool UpdateTrack(const kodi::addon::VisualizationTrack& track) override;
@@ -78,8 +76,11 @@ public:
 
 private:
   std::string path_join(std::string a, std::string b);
-  bool list_dir(const std::string& path, td_vec_str &store, bool recursive = false,
-               bool incl_full_path = true, std::string file_filter = "");
+  bool list_dir(const std::string& path,
+                td_vec_str& store,
+                bool recursive = false,
+                bool incl_full_path = true,
+                std::string file_filter = "");
   int get_next_img_pos();
   void load_presets(const std::string& path);
   void load_data(const std::string& path);
@@ -172,10 +173,8 @@ private:
   // The max height for each bar
   const GLfloat m_visBarMaxHeight = 0.18f;
 
-  const float m_visBottomEdgeScale[11] =
-  {
-    1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80
-  };
+  const float m_visBottomEdgeScale[11] = {1.0,  0.98, 0.96, 0.94, 0.92, 0.90,
+                                          0.88, 0.86, 0.84, 0.82, 0.80};
 
   // Whatever we get from AudioData
   GLfloat m_visBarHeights[m_visBarCount] = {};

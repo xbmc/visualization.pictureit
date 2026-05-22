@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018-2021 Team Kodi (https://kodi.tv)
+ *  Copyright (C) 2018-2026 Team Kodi (https://kodi.tv)
  *  Copyright (C) 2015-2019 LinuxWhatElse
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -30,10 +30,56 @@ CVisPictureIt::CVisPictureIt()
     m_imgLoaderActive(false),
     m_imgLoaded(false)
 {
+  // Load settings on constuctor to have on "GetPresets(...)" call available.
+  m_presetsRootDir = kodi::addon::GetSettingString("presets_root_dir");
+  m_updateOnNewTrack = kodi::addon::GetSettingBoolean("update_on_new_track");
+  m_updateByInterval = kodi::addon::GetSettingBoolean("update_by_interval");
+  m_imgUpdateInterval = kodi::addon::GetSettingInt("img_update_interval");
+  m_fadeTimeMs = kodi::addon::GetSettingInt("fade_time_ms");
+  m_visEnabled = kodi::addon::GetSettingBoolean("vis_enabled");
+  m_visBgEnabled = kodi::addon::GetSettingBoolean("vis_bg_enabled");
+
+  m_visWidth = kodi::addon::GetSettingInt("vis_half_width");
+  m_visWidth = m_visWidth * 1.0f / 100;
+
+  m_visAnimationSpeed = kodi::addon::GetSettingInt("vis_animation_speed");
+  m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
+
+  float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
+  m_visBottomEdge = scale[kodi::addon::GetSettingInt("vis_bottom_edge")];
 }
 
-CVisPictureIt::~CVisPictureIt()
+bool CVisPictureIt::Init()
 {
+  if (!m_shadersLoaded)
+  {
+    std::string fraqShader =
+        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
+    std::string vertShader =
+        kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
+    if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
+      return false;
+    m_shadersLoaded = true;
+  }
+
+  glGenBuffers(1, &m_vertexVBO);
+  glGenBuffers(1, &m_indexVBO);
+
+  if (!m_dataLoader)
+    m_dataLoader = std::make_shared<std::thread>(&CVisPictureIt::load_data, this, m_presetsRootDir);
+
+  m_initialized = true;
+
+  return true;
+}
+
+void CVisPictureIt::DeInit()
+{
+  if (!m_initialized)
+    return;
+
+  m_initialized = false;
+
   if (m_dataLoader != nullptr)
   {
     if (m_dataLoader->joinable())
@@ -60,30 +106,12 @@ CVisPictureIt::~CVisPictureIt()
   }
   m_piData.clear();
 
+  glDeleteBuffers(1, &m_vertexVBO);
+  m_vertexVBO = 0;
+  glDeleteBuffers(1, &m_indexVBO);
+  m_indexVBO = 0;
+
   glDeleteTextures(3, m_imgTextureIds);
-}
-
-ADDON_STATUS CVisPictureIt::Create()
-{
-  m_presetsRootDir = kodi::addon::GetSettingString("presets_root_dir");
-
-  m_updateOnNewTrack = kodi::addon::GetSettingBoolean("update_on_new_track");
-  m_updateByInterval = kodi::addon::GetSettingBoolean("update_by_interval");
-  m_imgUpdateInterval = kodi::addon::GetSettingInt("img_update_interval");
-  m_fadeTimeMs = kodi::addon::GetSettingInt("fade_time_ms");
-  m_visEnabled = kodi::addon::GetSettingBoolean("vis_enabled");
-  m_visBgEnabled = kodi::addon::GetSettingBoolean("vis_bg_enabled");
-
-  m_visWidth = kodi::addon::GetSettingInt("vis_half_width");
-  m_visWidth = m_visWidth * 1.0f / 100;
-
-  m_visAnimationSpeed = kodi::addon::GetSettingInt("vis_animation_speed");
-  m_visAnimationSpeed = m_visAnimationSpeed * 0.005f / 100;
-
-  float scale[] = {1.0, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82, 0.80};
-  m_visBottomEdge = scale[kodi::addon::GetSettingInt("vis_bottom_edge")];
-
-  return ADDON_STATUS_OK;
 }
 
 bool CVisPictureIt::GetPresets(std::vector<std::string>& presets)
@@ -127,42 +155,6 @@ bool CVisPictureIt::RandomPreset()
   return true;
 }
 
-bool CVisPictureIt::Start(int iChannels, int iSamplesPerSec,
-                          int iBitsPerSample, const std::string& szSongName)
-{
-  if (!m_shadersLoaded)
-  {
-    std::string fraqShader = kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/frag.glsl");
-    std::string vertShader = kodi::addon::GetAddonPath("resources/shaders/" GL_TYPE_STRING "/vert.glsl");
-    if (!LoadShaderFiles(vertShader, fraqShader) || !CompileAndLink())
-      return false;
-    m_shadersLoaded = true;
-  }
-
-  glGenBuffers(1, &m_vertexVBO);
-  glGenBuffers(1, &m_indexVBO);
-
-  if (!m_dataLoader)
-    m_dataLoader = std::make_shared<std::thread>(&CVisPictureIt::load_data, this, m_presetsRootDir);
-
-  m_initialized = true;
-
-  return true;
-}
-
-void CVisPictureIt::Stop()
-{
-  if (!m_initialized)
-    return;
-
-  m_initialized = false;
-
-  glDeleteBuffers(1, &m_vertexVBO);
-  m_vertexVBO = 0;
-  glDeleteBuffers(1, &m_indexVBO);
-  m_indexVBO = 0;
-}
-
 bool CVisPictureIt::UpdateTrack(const kodi::addon::VisualizationTrack& track)
 {
   if (m_updateOnNewTrack)
@@ -185,7 +177,7 @@ void CVisPictureIt::Render()
     m_updateImg = true;
   }
 
-  if (m_updateImg && ! m_dataLoaderActive)
+  if (m_updateImg && !m_dataLoaderActive)
   {
     kodi::Log(ADDON_LOG_DEBUG, "Requesting new image...");
     m_updateImg = false;
@@ -217,12 +209,13 @@ void CVisPictureIt::Render()
       glGenTextures(1, texture);
 
       glBindTexture(GL_TEXTURE_2D, texture[0]);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_imgWidth, m_imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_imgData);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_imgWidth, m_imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                   m_imgData);
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
       stbi_image_free(m_imgData);
       m_imgData = nullptr;
@@ -231,7 +224,12 @@ void CVisPictureIt::Render()
     }
 
     m_fadeCurrent = 0.0f;
-    m_fadeOffsetMs = static_cast<long>(std::chrono::duration<double>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() * 1000.0) % m_fadeTimeMs;
+    m_fadeOffsetMs =
+        static_cast<long>(std::chrono::duration<double>(
+                              std::chrono::high_resolution_clock::now().time_since_epoch())
+                              .count() *
+                          1000.0) %
+        m_fadeTimeMs;
   }
 
   // If we are within a crossfade, fade out the current image
@@ -246,7 +244,14 @@ void CVisPictureIt::Render()
 
   if (m_fadeOffsetMs && m_fadeCurrent < 1.0f)
   {
-    m_fadeCurrent = ((float) ((static_cast<long>(std::chrono::duration<double>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() * 1000.0) - m_fadeOffsetMs) % m_fadeTimeMs) / m_fadeTimeMs);
+    m_fadeCurrent = ((float)((static_cast<long>(
+                                  std::chrono::duration<double>(
+                                      std::chrono::high_resolution_clock::now().time_since_epoch())
+                                      .count() *
+                                  1000.0) -
+                              m_fadeOffsetMs) %
+                             m_fadeTimeMs) /
+                     m_fadeTimeMs);
     if (m_fadeCurrent < m_fadeLast)
     {
       m_fadeLast = 0.0f;
@@ -277,14 +282,17 @@ void CVisPictureIt::Render()
     if (m_visBgEnabled)
     {
       sLight framedTextures[4];
-      framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
-      framedTextures[0].vertex = sPosition(1.0f, (m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
-      framedTextures[1].vertex = sPosition(-1.0f,(m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
+      framedTextures[0].color = framedTextures[1].color = framedTextures[2].color =
+          framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, 0.7f);
+      framedTextures[0].vertex =
+          sPosition(1.0f, (m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
+      framedTextures[1].vertex =
+          sPosition(-1.0f, (m_visBottomEdge - m_visBarMaxHeight) - (1.0f - m_visBottomEdge));
       framedTextures[2].vertex = sPosition(-1.0f, 1.0f);
-      framedTextures[3].vertex = sPosition( 1.0f, 1.0f);
+      framedTextures[3].vertex = sPosition(1.0f, 1.0f);
 
       glEnable(GL_BLEND);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(sLight) * 4, framedTextures, GL_STATIC_DRAW);
       glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
       glDisable(GL_BLEND);
     }
@@ -306,7 +314,7 @@ void CVisPictureIt::Render()
       x1 = x1 + (bar_width / 4);
       x2 = x2 - (bar_width / 4);
 
-      draw_bars((i-1), x1, x2);
+      draw_bars((i - 1), x1, x2);
     }
 
     DisableShader();
@@ -330,7 +338,7 @@ void CVisPictureIt::AudioData(const float* pAudioData, size_t iAudioDataLength)
   // So I just copied the "rfft.h" and "rfft.cpp", renamed the classe to "MRFFT" (otherwise we'd use the original) and set
   // the flag to "true".
   // Further this gives us the ability to change the response if needed (They return the magnitude per default I believe)
-  if (m_prevFreqDataLength != iFreqDataLength || ! m_tranform)
+  if (m_prevFreqDataLength != iFreqDataLength || !m_tranform)
   {
     m_tranform.reset(new MRFFT(iFreqDataLength, true));
     m_prevFreqDataLength = iFreqDataLength;
@@ -365,7 +373,6 @@ void CVisPictureIt::AudioData(const float* pAudioData, size_t iAudioDataLength)
   delete[] freq_data;
 }
 
-
 std::string CVisPictureIt::path_join(std::string a, std::string b)
 {
   /**
@@ -387,14 +394,17 @@ std::string CVisPictureIt::path_join(std::string a, std::string b)
   // b ends with "/"
   if (b.substr(b.length() - 1, b.length()) == "/")
   {
-    b = b.substr(0, b.size() -1);
+    b = b.substr(0, b.size() - 1);
   }
 
   return a + "/" + b;
 }
 
-bool CVisPictureIt::list_dir(const std::string& path, td_vec_str &store, bool recursive,
-                             bool incl_full_path, std::string file_filter)
+bool CVisPictureIt::list_dir(const std::string& path,
+                             td_vec_str& store,
+                             bool recursive,
+                             bool incl_full_path,
+                             std::string file_filter)
 {
   std::vector<kodi::vfs::CDirEntry> items;
   if (!kodi::vfs::GetDirectory(path, file_filter, items))
@@ -443,7 +453,8 @@ int CVisPictureIt::get_next_img_pos()
   std::uniform_int_distribution<int> dist(0, m_piImages.size() - 1);
 
   int num = dist(engine);
-  if (num == m_imgCurrentPos && m_get_next_img_pos_Calls++ < 10) // try only 10 times to prevent possible dead loop
+  if (num == m_imgCurrentPos &&
+      m_get_next_img_pos_Calls++ < 10) // try only 10 times to prevent possible dead loop
     return get_next_img_pos();
 
   m_get_next_img_pos_Calls = 0;
@@ -486,7 +497,7 @@ void CVisPictureIt::load_data(const std::string& path)
   }
 
   td_vec_str images;
-  if (m_piPresets[0] == "Default" )
+  if (m_piPresets[0] == "Default")
   {
     list_dir(path, images, true, true, img_filter);
     m_piData[m_piPresets[0]] = images;
@@ -587,11 +598,13 @@ void CVisPictureIt::draw_image(GLuint img_tex_id, float opacity)
 
   if (!img_tex_id)
   {
-    framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, opacity);
+    framedTextures[0].color = framedTextures[1].color = framedTextures[2].color =
+        framedTextures[3].color = sColor(0.0f, 0.0f, 0.0f, opacity);
   }
   else
   {
-    framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(1.0f, 1.0f, 1.0f, opacity);
+    framedTextures[0].color = framedTextures[1].color = framedTextures[2].color =
+        framedTextures[3].color = sColor(1.0f, 1.0f, 1.0f, opacity);
   }
 
   framedTextures[0].vertex = sPosition(-1.0f, -1.0f);
@@ -604,7 +617,7 @@ void CVisPictureIt::draw_image(GLuint img_tex_id, float opacity)
   framedTextures[3].coord = sCoord(0.0f, 1.0f);
   m_textureUsed = true;
   EnableShader();
-  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight) * 4, framedTextures, GL_STATIC_DRAW);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
   DisableShader();
 
@@ -640,20 +653,21 @@ void CVisPictureIt::draw_bars(int i, GLfloat x1, GLfloat x2)
   GLfloat y2 = m_visBottomEdge - m_cvisBarHeights[i];
 
   sLight framedTextures[4];
-  framedTextures[0].color = framedTextures[1].color = framedTextures[2].color = framedTextures[3].color = sColor(1.0f, 1.0f, 1.0f, 1.0f);
+  framedTextures[0].color = framedTextures[1].color = framedTextures[2].color =
+      framedTextures[3].color = sColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-  framedTextures[0].vertex = sPosition(x1, y2);               // Top Left
-  framedTextures[1].vertex = sPosition(x2, y2);               // Top Right
-  framedTextures[2].vertex = sPosition(x2, m_visBottomEdge);  // Bottom Right
-  framedTextures[3].vertex = sPosition(x1, m_visBottomEdge);  // Bottom Left
-  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
+  framedTextures[0].vertex = sPosition(x1, y2); // Top Left
+  framedTextures[1].vertex = sPosition(x2, y2); // Top Right
+  framedTextures[2].vertex = sPosition(x2, m_visBottomEdge); // Bottom Right
+  framedTextures[3].vertex = sPosition(x1, m_visBottomEdge); // Bottom Left
+  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight) * 4, framedTextures, GL_STATIC_DRAW);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 
-  framedTextures[0].vertex = sPosition(-x2, y2);               // Top Left
-  framedTextures[1].vertex = sPosition(-x1, y2);               // Top Right
-  framedTextures[2].vertex = sPosition(-x1, m_visBottomEdge);  // Bottom Right
-  framedTextures[3].vertex = sPosition(-x2, m_visBottomEdge);  // Bottom Left
-  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight)*4, framedTextures, GL_STATIC_DRAW);
+  framedTextures[0].vertex = sPosition(-x2, y2); // Top Left
+  framedTextures[1].vertex = sPosition(-x1, y2); // Top Right
+  framedTextures[2].vertex = sPosition(-x1, m_visBottomEdge); // Bottom Right
+  framedTextures[3].vertex = sPosition(-x2, m_visBottomEdge); // Bottom Left
+  glBufferData(GL_ARRAY_BUFFER, sizeof(sLight) * 4, framedTextures, GL_STATIC_DRAW);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 }
 
@@ -667,15 +681,18 @@ void CVisPictureIt::start_render()
 
   glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*4, m_index, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte) * 4, m_index, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(m_hVertex, 4, GL_FLOAT, GL_TRUE, sizeof(sLight), BUFFER_OFFSET(offsetof(sLight, vertex)));
+  glVertexAttribPointer(m_hVertex, 4, GL_FLOAT, GL_TRUE, sizeof(sLight),
+                        BUFFER_OFFSET(offsetof(sLight, vertex)));
   glEnableVertexAttribArray(m_hVertex);
 
-  glVertexAttribPointer(m_hColor, 4, GL_FLOAT, GL_TRUE, sizeof(sLight), BUFFER_OFFSET(offsetof(sLight, color)));
+  glVertexAttribPointer(m_hColor, 4, GL_FLOAT, GL_TRUE, sizeof(sLight),
+                        BUFFER_OFFSET(offsetof(sLight, color)));
   glEnableVertexAttribArray(m_hColor);
 
-  glVertexAttribPointer(m_hCoord, 2, GL_FLOAT, GL_TRUE, sizeof(sLight), BUFFER_OFFSET(offsetof(sLight, coord)));
+  glVertexAttribPointer(m_hCoord, 2, GL_FLOAT, GL_TRUE, sizeof(sLight),
+                        BUFFER_OFFSET(offsetof(sLight, coord)));
   glEnableVertexAttribArray(m_hCoord);
 }
 
